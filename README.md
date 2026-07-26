@@ -5,6 +5,7 @@ notes etc...
 So... *sloppytop* is not a great name for anything at all. If someone has a better
 name please recommend.
 
+
 # Usage
 1. Go to the "settings.json" file and set the root variable according to your environment.
 2. Run the "main.py" file with a valid Python (version > 3.14.5) interpreter.
@@ -13,10 +14,17 @@ name please recommend.
 5. Repeat until encountering a valid image file, pressing enter will load the image.
 6. You can move images by dragging them, you can scale images with by scrolling.
 
-# Upcoming
-1. Fixing scaling issues.
-2. Save program state.
-3. Improve the search box.
 
-# Issues
-1. The current scaling implementation is completely broken and dangerous.
+# Patch Notes
+
+## New
+1. Fixed scaling issues.
+
+## Upcoming
+1. Improve the search box.
+2. Image comments.
+3. Save program state.
+4. Cursor centered scaling.
+
+## Issues
+1. The cursor 'loses' the image if one drags to fast.

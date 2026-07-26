@@ -2,6 +2,7 @@ import json
 import os
 import pygame as pg
 from search_box import SearchBox
+from image_network import ImageNetwork
 
 
 with open("palette.json", "r") as file:
@@ -28,37 +29,25 @@ search_box = SearchBox(
     color_text=COLOR_TEXT,
     result=None
 )
+images = ImageNetwork(
+    count=0,
+    srf_on=[],
+    srf_off=[],
+    srf_pos=[],
+    srf_size_on=[],
+    srf_size_off=[],
+    srf_zoom=[],
+    ifoc=0
+)
 
-images_offline = []
-images_online = []
-pos = []
-width = []
-height = []
-scale = []
-
-x0, y0 = 0, 0
 while True:
-    dx, dy = 0, 0
-    dz = 0
     for event in pg.event.get():
+        images.listen(event)
         search_box.listen(event)
         if search_box.result is not None:
             srf = pg.image.load(search_box.result).convert_alpha()
-            images_offline.append(srf)
-            srf = pg.transform.smoothscale_by(srf, .5*WIDTH / srf.get_width())
-            images_online.append(srf)
-            pos.append(((WIDTH - srf.get_width())/2, (HEIGHT - srf.get_height())/2))
-            width.append(srf.get_width())
-            height.append(srf.get_height())
-            scale.append(1.0)
+            images.load(srf, WIDTH, HEIGHT)
             search_box.result = None
-
-        if event.type == pg.MOUSEWHEEL:
-            dz = 1.0 - event.y *.1
-
-        if event.type == pg.MOUSEMOTION and event.buttons[0]:
-            x0, y0 = event.pos
-            dx, dy = event.rel
 
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
@@ -66,17 +55,7 @@ while True:
                 exit()
 
     screen.fill(COLOR_BACKGROUND)
-
-    locked = False
-    for i, ((x, y), w, h, s, srf, srf_off) in enumerate(zip(pos, width, height, scale, images_online, images_offline)):
-        if x < x0 < x + w and y < y0 < y + h and not locked:
-            if dz != 0:
-                scale[i] /= dz
-                print(s)
-                images_online[i] = pg.transform.smoothscale_by(srf_off, s)
-            pos[i] = (x + dx, y + dy)
-            locked = True
-        screen.blit(srf, (x, y))
+    images.draw(screen)
 
     search_box.draw(screen)
     pg.display.update()
