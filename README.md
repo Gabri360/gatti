@@ -1,6 +1,8 @@
 # Introduction
 The program is currently useless. I am writing this because I have a bunch of images of
-notes etc...
+notes etc. that I want to organize. Ideally this program's functionality will be limited 
+to: *displaying*, *arranging*, *grouping*, and *commenting* images.
+
 
 So... *sloppytop* is not a great name for anything at all. If someone has a better
 name please recommend.
@@ -14,7 +16,6 @@ name please recommend.
 5. Repeat until encountering a valid image file, pressing enter will load the image.
 6. You can move images by dragging them, you can scale images with by scrolling.
 
-
 # Patch Notes
 
 ## New
@@ -27,7 +28,6 @@ name please recommend.
 4. Save program state.
 5. Cursor centered scaling.
 6. World grid.
-
 
 ## Issues
 1. The cursor 'loses' the image if one drags to fast.
