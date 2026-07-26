@@ -25,25 +25,34 @@ class ImageNetwork:
     # focused image index
     ifoc: int
 
-    def listen(self, event):
+    @property
+    def focused(self):
+        return self.ifoc < self.count
 
-        if event.type == pg.MOUSEWHEEL:
+    def listen(self, event, cam):
+
+        if event.type == pg.MOUSEWHEEL and self.focused:
             self.srf_zoom[self.ifoc] /= 1.0 - event.y * 0.05
             self.srf_size_on[self.ifoc].x = self.srf_size_off[self.ifoc].x * self.srf_zoom[self.ifoc]
             self.srf_size_on[self.ifoc].y = self.srf_size_off[self.ifoc].y * self.srf_zoom[self.ifoc]
             self.srf_on[self.ifoc] = pg.transform.smoothscale_by(self.srf_off[self.ifoc], self.srf_zoom[self.ifoc])
 
         elif event.type == pg.MOUSEMOTION and event.buttons[0]:
+            self.ifoc = self.count
             for i in reversed(range(0, self.count)):
-                if self.pt_in_box(Vec2(*event.pos), self.srf_pos[i], self.srf_size_on[i]):
+                pt_pos_abs = Vec2(
+                    x=event.pos[0] + cam.x,
+                    y=event.pos[1] + cam.y
+                )
+                if self.pt_in_box(pt_pos_abs, self.srf_pos[i], self.srf_size_on[i]):
                     self.srf_pos[i].x += event.rel[0]
                     self.srf_pos[i].y += event.rel[1]
                     self.ifoc = i
                     break
 
-    def draw(self, screen):
+    def draw(self, screen, cam):
         for i in range(self.count):
-            screen.blit(self.srf_on[i], (self.srf_pos[i].x, self.srf_pos[i].y))
+            screen.blit(self.srf_on[i], (self.srf_pos[i].x - cam.x, self.srf_pos[i].y - cam.y))
 
     def load(self, srf_off, win_width, win_height):
         self.srf_off.append(srf_off)
