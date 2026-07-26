@@ -3,10 +3,10 @@ The program is currently useless. I am writing this because I have a bunch of im
 notes etc. that I want to organize. Ideally this program's functionality will be limited 
 to: *displaying*, *arranging*, *grouping*, and *commenting* images.
 
-
-So... *sloppytop* is not a great name for anything at all. If someone has a better
-name please recommend.
-
+# Installation
+1. Download this repository.
+2. This python script requires the following package obtainable by `pip install pygame-ce`.
+3. Run `python main.py`.
 
 # Usage
 1. Go to the "settings.json" file and set the root variable according to your environment.
@@ -19,15 +19,17 @@ name please recommend.
 # Patch Notes
 
 ## New
-1. Added camera and global displacement.
+1. Cursor centered scaling.
 
 ## Upcoming
 1. Camera zooming in/out globally.
 2. Improve the search box.
 3. Image comments.
 4. Save program state.
-5. Cursor centered scaling.
-6. World grid.
+5. World grid.
 
 ## Issues
 1. The cursor 'loses' the image if one drags to fast.
+
+# Trivia
+1. The name *tom* came to mind while thinking of the song title "tower of memories" by ivri.

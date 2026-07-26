@@ -1,5 +1,5 @@
 import pygame as pg
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass(slots=True)
 class Vec2:
@@ -32,9 +32,18 @@ class ImageNetwork:
     def listen(self, event, cam):
 
         if event.type == pg.MOUSEWHEEL and self.focused:
+            x, y = pg.mouse.get_pos()
+            x += cam.x
+            y += cam.y
+            self.srf_pos[self.ifoc].x -= x
+            self.srf_pos[self.ifoc].y -= y
             self.srf_zoom[self.ifoc] /= 1.0 - event.y * 0.05
             self.srf_size_on[self.ifoc].x = self.srf_size_off[self.ifoc].x * self.srf_zoom[self.ifoc]
             self.srf_size_on[self.ifoc].y = self.srf_size_off[self.ifoc].y * self.srf_zoom[self.ifoc]
+            self.srf_pos[self.ifoc].x /= 1.0 - event.y * 0.05
+            self.srf_pos[self.ifoc].y /= 1.0 - event.y * 0.05
+            self.srf_pos[self.ifoc].x += x
+            self.srf_pos[self.ifoc].y += y
             self.srf_on[self.ifoc] = pg.transform.smoothscale_by(self.srf_off[self.ifoc], self.srf_zoom[self.ifoc])
 
         elif event.type == pg.MOUSEMOTION and event.buttons[0]:

@@ -20,7 +20,7 @@ with open("settings.json", "r") as file:
 
 
 pg.init()
-pg.display.set_caption("Desktop")
+pg.display.set_caption("tom")
 screen = pg.display.set_mode((WIDTH, HEIGHT))
 cam = Camera(x=0, y=0, z=0)
 search_box = SearchBox(
