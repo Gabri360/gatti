@@ -1,6 +1,7 @@
 import json
 import os
 import pygame as pg
+from search_box import SearchBox
 
 
 with open("palette.json", "r") as file:
@@ -19,9 +20,14 @@ with open("settings.json", "r") as file:
 pg.init()
 pg.display.set_caption("Desktop")
 screen = pg.display.set_mode((WIDTH, HEIGHT))
-font = pg.font.SysFont("Calibri", 16)
-buffer = ROOT
-neighbours = [buffer + n for n in os.listdir(buffer)]
+search_box = SearchBox(
+    font=pg.font.SysFont("Calibri", 16),
+    buffer=ROOT,
+    root=ROOT,
+    neighbours=[ROOT + n for n in sorted(os.listdir(ROOT))],
+    color_text=COLOR_TEXT,
+    result=None
+)
 
 images_offline = []
 images_online = []
@@ -30,26 +36,19 @@ pos = []
 while True:
 
     for event in pg.event.get():
+        search_box.listen(event)
+        if search_box.result is not None:
+            srf = pg.image.load(search_box.result).convert_alpha()
+            images_offline.append(srf)
+            images_online.append(pg.transform.smoothscale_by(srf, .5*WIDTH / srf.get_width()))
+            search_box.result = None
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
                 pg.quit()
                 exit()
-            elif event.key == pg.K_RETURN:
-                buffer = [n for n in neighbours if buffer in n][0]
-                if os.path.isdir(buffer):
-                    buffer += '/'
-                    neighbours = [buffer + n for n in os.listdir(buffer)]
-                else:
-                    srf = pg.image.load(path).convert_alpha()
-                    images_offline.append(srf)
-                    images_online.append(pg.transform.smoothscale_by(srf, .5*WIDTH / srf.get_width()))
-            else:
-                buffer += event.unicode
 
     screen.fill(COLOR_BACKGROUND)
     for srf in images_online:
         screen.blit(srf, (0, 0))
-    screen.blit(font.render(buffer, antialias=True, color=COLOR_TEXT), (0, 0))
-    for i, path in enumerate(n for n in neighbours if buffer in n):
-        screen.blit(font.render(path, antialias=True, color=COLOR_TEXT), (0, (i + 1) * font.get_height()))
+    search_box.draw(screen)
     pg.display.update()
