@@ -19,7 +19,7 @@ class SearchBox:
                 self.partial = self.partial[:-1]
             elif event.key == pg.K_RETURN:
                 self.partial = [n for n in self.candidates if self.partial in n][0]
-                if os.path.isdir(self.root + '/'.join(self.path) + self.partial):
+                if os.path.isdir(self.root + '/'.join(self.path + [self.partial])):
                     self.path.append(self.partial)
                     self.partial = ""
                     self.candidates = [n for n in sorted(os.listdir(self.root + '/'.join(self.path + [self.partial])))]

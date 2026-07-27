@@ -22,7 +22,7 @@ with open("settings.json", "r") as file:
 pg.init()
 pg.display.set_caption("tom")
 screen = pg.display.set_mode((WIDTH, HEIGHT))
-cam = Camera(x=0, y=0, z=0)
+cam = Camera(x=0, y=0, z=1)
 search_box = SearchBox(
     font=pg.font.SysFont("Calibri", 16),
     partial="",

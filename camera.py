@@ -9,6 +9,9 @@ class Camera:
     z: float
 
     def listen(self, event):
+        if event.type == pg.MOUSEWHEEL:
+            self.z /= 1.0 - event.y * 0.05
+
         if event.type == pg.MOUSEMOTION and event.buttons[0]:
             self.x -= event.rel[0]
             self.y -= event.rel[1]
