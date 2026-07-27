@@ -1,10 +1,7 @@
 import pygame as pg
+from camera import Vec2
 from dataclasses import dataclass, field
 
-@dataclass(slots=True)
-class Vec2:
-    x: float
-    y: float
 
 @dataclass(slots=True)
 class ImageNetwork:
@@ -32,61 +29,41 @@ class ImageNetwork:
     def listen(self, event, cam):
 
         if event.type == pg.MOUSEWHEEL and not self.focused:
-            x, y = pg.mouse.get_pos()
-            x += cam.x
-            y += cam.y
-
-            # Global
-            cam.z /= 1.0 - event.y * 0.05
             for i in range(self.count):
-                self.srf_pos[i].x -= x
-                self.srf_pos[i].y -= y
-                
-                self.srf_size_on[i].x = self.srf_size_off[i].x * cam.z * self.srf_zoom[i]
-                self.srf_size_on[i].y = self.srf_size_off[i].y * cam.z * self.srf_zoom[i]
-                
-                self.srf_pos[i].x /= 1.0 - event.y * 0.05
-                self.srf_pos[i].y /= 1.0 - event.y * 0.05
-                self.srf_pos[i].x += x
-                self.srf_pos[i].y += y
                 self.srf_on[i] = pg.transform.smoothscale_by(self.srf_off[i], cam.z * self.srf_zoom[i])
-
 
         if event.type == pg.MOUSEWHEEL and self.focused:
             x, y = pg.mouse.get_pos()
-            x += cam.x
-            y += cam.y
+            cur_proj = cam.posabs(Vec2(x, y))
 
-            # Local 
-            self.srf_pos[self.ifoc].x -= x
-            self.srf_pos[self.ifoc].y -= y
+            # Local
+            self.srf_pos[self.ifoc].x -= cur_proj.x
+            self.srf_pos[self.ifoc].y -= cur_proj.y
 
             self.srf_zoom[self.ifoc] /= 1.0 - event.y * 0.05
-            self.srf_size_on[self.ifoc].x = self.srf_size_off[self.ifoc].x * cam.z * self.srf_zoom[self.ifoc]
-            self.srf_size_on[self.ifoc].y = self.srf_size_off[self.ifoc].y * cam.z * self.srf_zoom[self.ifoc]
+            self.srf_size_on[self.ifoc].x = self.srf_size_off[self.ifoc].x * self.srf_zoom[self.ifoc]
+            self.srf_size_on[self.ifoc].y = self.srf_size_off[self.ifoc].y * self.srf_zoom[self.ifoc]
 
             self.srf_pos[self.ifoc].x /= 1.0 - event.y * 0.05
             self.srf_pos[self.ifoc].y /= 1.0 - event.y * 0.05
-            self.srf_pos[self.ifoc].x += x
-            self.srf_pos[self.ifoc].y += y
+            self.srf_pos[self.ifoc].x += cur_proj.x
+            self.srf_pos[self.ifoc].y += cur_proj.y
             self.srf_on[self.ifoc] = pg.transform.smoothscale_by(self.srf_off[self.ifoc], cam.z * self.srf_zoom[self.ifoc])
 
         elif event.type == pg.MOUSEMOTION and event.buttons[0]:
             self.ifoc = self.count
             for i in reversed(range(0, self.count)):
-                pt_pos_abs = Vec2(
-                    x=event.pos[0] + cam.x,
-                    y=event.pos[1] + cam.y
-                )
-                if self.pt_in_box(pt_pos_abs, self.srf_pos[i], self.srf_size_on[i]):
-                    self.srf_pos[i].x += event.rel[0]
-                    self.srf_pos[i].y += event.rel[1]
+                cur_proj = cam.posabs(Vec2(event.pos[0], event.pos[1]))
+                if self.pt_in_box(cur_proj, self.srf_pos[i], self.srf_size_on[i]):
+                    self.srf_pos[i].x += cam.lenabs(event.rel[0])
+                    self.srf_pos[i].y += cam.lenabs(event.rel[1])
                     self.ifoc = i
                     break
 
     def draw(self, screen, cam):
         for i in range(self.count):
-            screen.blit(self.srf_on[i], (self.srf_pos[i].x - cam.x, self.srf_pos[i].y - cam.y))
+            pos = cam.posrel(self.srf_pos[i])
+            screen.blit(self.srf_on[i], (pos.x, pos.y))
 
     def load(self, srf_off, win_width, win_height):
         self.srf_off.append(srf_off)
