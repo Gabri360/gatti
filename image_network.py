@@ -31,20 +31,45 @@ class ImageNetwork:
 
     def listen(self, event, cam):
 
+        if event.type == pg.MOUSEWHEEL and not self.focused:
+            x, y = pg.mouse.get_pos()
+            x += cam.x
+            y += cam.y
+
+            # Global
+            cam.z /= 1.0 - event.y * 0.05
+            for i in range(self.count):
+                self.srf_pos[i].x -= x
+                self.srf_pos[i].y -= y
+                
+                self.srf_size_on[i].x = self.srf_size_off[i].x * cam.z * self.srf_zoom[i]
+                self.srf_size_on[i].y = self.srf_size_off[i].y * cam.z * self.srf_zoom[i]
+                
+                self.srf_pos[i].x /= 1.0 - event.y * 0.05
+                self.srf_pos[i].y /= 1.0 - event.y * 0.05
+                self.srf_pos[i].x += x
+                self.srf_pos[i].y += y
+                self.srf_on[i] = pg.transform.smoothscale_by(self.srf_off[i], cam.z * self.srf_zoom[i])
+
+
         if event.type == pg.MOUSEWHEEL and self.focused:
             x, y = pg.mouse.get_pos()
             x += cam.x
             y += cam.y
+
+            # Local 
             self.srf_pos[self.ifoc].x -= x
             self.srf_pos[self.ifoc].y -= y
+
             self.srf_zoom[self.ifoc] /= 1.0 - event.y * 0.05
-            self.srf_size_on[self.ifoc].x = self.srf_size_off[self.ifoc].x * self.srf_zoom[self.ifoc]
-            self.srf_size_on[self.ifoc].y = self.srf_size_off[self.ifoc].y * self.srf_zoom[self.ifoc]
+            self.srf_size_on[self.ifoc].x = self.srf_size_off[self.ifoc].x * cam.z * self.srf_zoom[self.ifoc]
+            self.srf_size_on[self.ifoc].y = self.srf_size_off[self.ifoc].y * cam.z * self.srf_zoom[self.ifoc]
+
             self.srf_pos[self.ifoc].x /= 1.0 - event.y * 0.05
             self.srf_pos[self.ifoc].y /= 1.0 - event.y * 0.05
             self.srf_pos[self.ifoc].x += x
             self.srf_pos[self.ifoc].y += y
-            self.srf_on[self.ifoc] = pg.transform.smoothscale_by(self.srf_off[self.ifoc], self.srf_zoom[self.ifoc])
+            self.srf_on[self.ifoc] = pg.transform.smoothscale_by(self.srf_off[self.ifoc], cam.z * self.srf_zoom[self.ifoc])
 
         elif event.type == pg.MOUSEMOTION and event.buttons[0]:
             self.ifoc = self.count
