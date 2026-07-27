@@ -25,9 +25,10 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))
 cam = Camera(x=0, y=0, z=0)
 search_box = SearchBox(
     font=pg.font.SysFont("Calibri", 16),
-    buffer=ROOT,
+    partial="",
     root=ROOT,
-    neighbours=[ROOT + n for n in sorted(os.listdir(ROOT))],
+    path=[],
+    candidates=[n for n in sorted(os.listdir(ROOT))],
     color_text=COLOR_TEXT,
     result=None
 )
