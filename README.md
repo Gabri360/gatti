@@ -19,7 +19,7 @@ to: *displaying*, *arranging*, *grouping*, and *commenting* images.
 # Patch Notes
 
 ## New
-Save program state.
+Clicking an images moves it automatically to the top layer.
 
 ## Upcoming
 1. Improve the search box.

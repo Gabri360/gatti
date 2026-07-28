@@ -107,7 +107,14 @@ class ImageNetwork:
                 if self.pt_in_box(cur_proj, self.srf_pos[i], self.srf_size_on[i]):
                     self.srf_pos[i].x += cam.lenabs(event.rel[0])
                     self.srf_pos[i].y += cam.lenabs(event.rel[1])
-                    self.ifoc = i
+                    self.paths[i], self.paths[-1] = self.paths[-1], self.paths[i]
+                    self.srf_on[i], self.srf_on[-1] = self.srf_on[-1], self.srf_on[i]
+                    self.srf_off[i], self.srf_off[-1] = self.srf_off[-1], self.srf_off[i]
+                    self.srf_pos[i], self.srf_pos[-1] = self.srf_pos[-1], self.srf_pos[i]
+                    self.srf_size_on[i], self.srf_size_on[-1] = self.srf_size_on[-1], self.srf_size_on[i]
+                    self.srf_size_off[i], self.srf_size_off[-1] = self.srf_size_off[-1], self.srf_size_off[i]
+                    self.srf_zoom[i], self.srf_zoom[-1] = self.srf_zoom[-1], self.srf_zoom[i]
+                    self.ifoc = self.count - 1
                     break
 
     def draw(self, screen, cam):
