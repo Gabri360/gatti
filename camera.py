@@ -31,7 +31,11 @@ class Camera:
             self.y -= event.rel[1] / self.z
 
         if event.type == pg.MOUSEWHEEL:
-            self.z /= 1.0 - event.y * 0.05
+            x, y = pg.mouse.get_pos()
+            dz = 1.0 - event.y * 0.05
+            self.x += x * ((1 - dz) / self.z)
+            self.y += y * ((1 - dz) / self.z)
+            self.z /= dz
 
     def lenrel(self, d):
         return d * self.z

@@ -43,7 +43,7 @@ class ImageNetwork:
         )
 
     @classmethod
-    def load(cls, d):
+    def load(cls, d, cam):
         paths = []
         srf_on = []
         srf_off = []
@@ -55,7 +55,7 @@ class ImageNetwork:
             srf = pg.image.load(img["path"]).convert_alpha()
             s = img["z"]
             paths.append(img["path"])
-            srf_on.append(pg.transform.smoothscale_by(srf, s))
+            srf_on.append(pg.transform.smoothscale_by(srf, s * cam.z))
             srf_off.append(srf)
             srf_pos.append(Vec2(img["x"], img["y"]))
             srf_size_on.append(Vec2(img["w"] * s, img["h"] * s))
@@ -87,7 +87,6 @@ class ImageNetwork:
             x, y = pg.mouse.get_pos()
             cur_proj = cam.posabs(Vec2(x, y))
 
-            # Local
             self.srf_pos[self.ifoc].x -= cur_proj.x
             self.srf_pos[self.ifoc].y -= cur_proj.y
 

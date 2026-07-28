@@ -28,7 +28,7 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))
 try:
     with tarfile.open("save.tom", "r:gz") as tar:
         cam = Camera.load(json.load(tar.extractfile("camera.json")))
-        images = ImageNetwork.load(json.load(tar.extractfile("network.json")))
+        images = ImageNetwork.load(json.load(tar.extractfile("network.json")), cam)
 
 except FileNotFoundError:
     cam = Camera.empty()
@@ -47,9 +47,11 @@ search_box = SearchBox(
 while True:
     for event in pg.event.get():
         search_box.listen(event)
-        images.listen(event, cam)
+        #images.listen(event, cam)
         if not images.focused:
             cam.listen(event)
+        #
+        images.listen(event, cam)
         if search_box.result is not None:
             srf = pg.image.load(search_box.result).convert_alpha()
             images.add(search_box.result, srf, WIDTH, HEIGHT)
