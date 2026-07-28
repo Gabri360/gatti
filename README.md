@@ -13,6 +13,8 @@ Ideally this program's functionality will be limited to: *displaying*, *arrangin
 4. When the hints collapse to a single one press enter.
 5. Repeat until encountering a valid image file, pressing enter will load the image.
 6. You can move images by dragging them, you can scale images with by scrolling.
+7. Remove images with `x` and screenshot the whole display with `s`.
+
 
 # Patch Notes
 
