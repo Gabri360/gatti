@@ -100,6 +100,16 @@ class ImageNetwork:
             self.srf_pos[self.ifoc].y += cur_proj.y
             self.srf_on[self.ifoc] = pg.transform.smoothscale_by(self.srf_off[self.ifoc], cam.z * self.srf_zoom[self.ifoc])
 
+        elif event.type == pg.KEYDOWN and event.key == pg.K_x and self.focused:
+            self.paths.pop(self.ifoc)
+            self.srf_on.pop(self.ifoc)
+            self.srf_off.pop(self.ifoc)
+            self.srf_pos.pop(self.ifoc)
+            self.srf_size_on.pop(self.ifoc)
+            self.srf_size_off.pop(self.ifoc)
+            self.srf_zoom.pop(self.ifoc)
+            self.count -= 1
+
         elif event.type == pg.MOUSEMOTION and event.buttons[0]:
             self.ifoc = self.count
             for i in reversed(range(0, self.count)):
@@ -122,7 +132,7 @@ class ImageNetwork:
             pos = cam.posrel(self.srf_pos[i])
             screen.blit(self.srf_on[i], (pos.x, pos.y))
 
-    def add(self, path, srf_off, win_width, win_height):
+    def add(self, path, srf_off, win_width, win_height, cam):
         self.paths.append(path)
         self.srf_off.append(srf_off)
         self.srf_size_off.append(Vec2(
@@ -130,16 +140,16 @@ class ImageNetwork:
             y=srf_off.get_height()
         ))
         init_scale = 0.5 * win_width / srf_off.get_width()
-        self.srf_zoom.append(init_scale)
+        self.srf_zoom.append(init_scale / cam.z)
         srf_on = pg.transform.smoothscale_by(srf_off, init_scale)
         self.srf_on.append(srf_on)
-        self.srf_pos.append(Vec2(
-            (win_width - srf_on.get_width()) / 2,
-            (win_height - srf_on.get_height()) / 2
-        ))
+        self.srf_pos.append(cam.posabs(Vec2(
+            x=(win_width-srf_on.get_width())/2,
+            y=(win_height-srf_on.get_height())/2
+        )))
         self.srf_size_on.append(Vec2(
-            x=srf_on.get_width(),
-            y=srf_on.get_height()
+            x=srf_off.get_width() * init_scale,
+            y=srf_off.get_height() * init_scale
         ))
         self.count += 1
 

@@ -47,18 +47,18 @@ search_box = SearchBox(
 while True:
     for event in pg.event.get():
         search_box.listen(event)
-        #images.listen(event, cam)
         if not images.focused:
             cam.listen(event)
-        #
         images.listen(event, cam)
         if search_box.result is not None:
             srf = pg.image.load(search_box.result).convert_alpha()
-            images.add(search_box.result, srf, WIDTH, HEIGHT)
+            images.add(search_box.result, srf, WIDTH, HEIGHT, cam)
             search_box.result = None
 
         if event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
+            if event.key == pg.K_s or event.key == pg.K_ESCAPE:
+                if event.key == pg.K_s:
+                    pg.image.save(screen, "tom.png")
                 # Save state
                 with tarfile.open("save.tom", "w:gz") as tar:
                     # Camera

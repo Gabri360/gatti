@@ -17,7 +17,7 @@ Ideally this program's functionality will be limited to: *displaying*, *arrangin
 # Patch Notes
 
 ## New
-Clicking an images moves it automatically to the top layer.
+Remove images with `x` and screenshot the whole display with `s`.
 
 ## Upcoming
 1. Improve the search box.
