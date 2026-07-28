@@ -1,7 +1,5 @@
 # Introduction
-The program is currently useless. I am writing this because I have a bunch of images of
-notes etc. that I want to organize. Ideally this program's functionality will be limited 
-to: *displaying*, *arranging*, *grouping*, and *commenting* images.
+Ideally this program's functionality will be limited to: *displaying*, *arranging*, *grouping*, and *commenting* images.
 
 # Installation
 1. Download this repository.
@@ -30,4 +28,5 @@ Clicking an images moves it automatically to the top layer.
 1. The cursor 'loses' the image if one drags to fast.
 
 # Trivia
-1. The name *tom* came to mind while thinking of the song title "tower of memories" by ivri.
+* This program originated from an idea of mine at the end of July of 2026, I had many exams to take but the excuse to spend time making this was that it was *essential* for organizing my notes.
+* The name *tom* came to mind while thinking of the song title "tower of memories" by ivri.
