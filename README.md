@@ -19,13 +19,12 @@ to: *displaying*, *arranging*, *grouping*, and *commenting* images.
 # Patch Notes
 
 ## New
-1. Camera zooming in/out globally.
+Save program state.
 
 ## Upcoming
 1. Improve the search box.
 2. Image comments.
-3. Save program state.
-4. World grid.
+3. World grid.
 
 ## Issues
 1. The cursor 'loses' the image if one drags to fast.

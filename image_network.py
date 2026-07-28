@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 class ImageNetwork:
     # image count
     count: int
+    # paths
+    paths: list[str]
     # online images
     srf_on: list[pg.Surface]
     # offline images
@@ -25,6 +27,55 @@ class ImageNetwork:
     @property
     def focused(self):
         return self.ifoc < self.count
+
+    @classmethod
+    def empty(cls):
+        return cls(
+            count=0,
+            paths=[],
+            srf_on=[],
+            srf_off=[],
+            srf_pos=[],
+            srf_size_on=[],
+            srf_size_off=[],
+            srf_zoom=[],
+            ifoc=0
+        )
+
+    @classmethod
+    def load(cls, d):
+        paths = []
+        srf_on = []
+        srf_off = []
+        srf_pos = []
+        srf_size_on = []
+        srf_size_off = []
+        srf_zoom = []
+        for img in d:
+            srf = pg.image.load(img["path"]).convert_alpha()
+            s = img["z"]
+            paths.append(img["path"])
+            srf_on.append(pg.transform.smoothscale_by(srf, s))
+            srf_off.append(srf)
+            srf_pos.append(Vec2(img["x"], img["y"]))
+            srf_size_on.append(Vec2(img["w"] * s, img["h"] * s))
+            srf_size_off.append(Vec2(img["w"], img["h"]))
+            srf_zoom.append(s)
+        return cls(len(d), paths, srf_on, srf_off, srf_pos, srf_size_on, srf_size_off, srf_zoom, len(d))
+
+    def dump(self):
+        d = []
+        for i in range(self.count):
+            d.append({
+                "path": self.paths[i],
+                "x": self.srf_pos[i].x,
+                "y": self.srf_pos[i].y,
+                "z": self.srf_zoom[i],
+                "w": self.srf_size_off[i].x,
+                "h": self.srf_size_off[i].y
+            })
+        return d
+
 
     def listen(self, event, cam):
 
@@ -65,7 +116,8 @@ class ImageNetwork:
             pos = cam.posrel(self.srf_pos[i])
             screen.blit(self.srf_on[i], (pos.x, pos.y))
 
-    def load(self, srf_off, win_width, win_height):
+    def add(self, path, srf_off, win_width, win_height):
+        self.paths.append(path)
         self.srf_off.append(srf_off)
         self.srf_size_off.append(Vec2(
             x=srf_off.get_width(),
