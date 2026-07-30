@@ -5,7 +5,7 @@ import os
 import pygame as pg
 from search_box import SearchBox
 from image_network import ImageNetwork
-from camera import Camera
+from camera import Camera, Vec2
 
 
 with open("palette.json", "r") as file:
@@ -35,7 +35,9 @@ except FileNotFoundError:
     images = ImageNetwork.empty()
 
 search_box = SearchBox(
-    font=pg.font.SysFont("Calibri", 16),
+    pos=Vec2((WIDTH - WIDTH / 2) / 2, (HEIGHT - HEIGHT / 12) / 2),
+    size=Vec2(WIDTH / 2, HEIGHT / 12),
+    font=pg.font.SysFont("Calibri", 24),
     partial="",
     root=ROOT,
     path=[],
@@ -56,9 +58,10 @@ while True:
             search_box.result = None
 
         if event.type == pg.KEYDOWN:
-            if event.key == pg.K_s or event.key == pg.K_ESCAPE:
-                if event.key == pg.K_s:
-                    pg.image.save(screen, "tom.png")
+            if event.key == pg.K_ESCAPE:
+            #if event.key == pg.K_s or event.key == pg.K_ESCAPE:
+                #if event.key == pg.K_s:
+                #    pg.image.save(screen, "tom.png")
                 # Save state
                 with tarfile.open("save.tom", "w:gz") as tar:
                     # Camera
@@ -76,6 +79,6 @@ while True:
 
     screen.fill(COLOR_BACKGROUND)
     images.draw(screen, cam)
-
     search_box.draw(screen)
+
     pg.display.update()
