@@ -1,27 +1,12 @@
-from io import BytesIO
-import tarfile
-import json
 import os
 import pygame as pg
 from enum import Enum, auto
 from search_box import SearchBox
 from image_network import ImageNetwork
 from camera import Camera, Vec2
-
-
-with open("palette.json", "r") as file:
-    palette = json.load(file)
-    COLOR_BG_TRAVEL = palette["background-travel"]
-    COLOR_BG_MOVE = palette["background-move"]
-    COLOR_BG_SEARCH = palette["background-search"]
-    COLOR_TEXT = palette["text"]
-    
-
-with open("settings.json", "r") as file:
-    settings = json.load(file)
-    WIDTH = settings["width"]
-    HEIGHT = settings["height"]
-    ROOT = settings["root"]
+import tom_colors
+import tom_params
+import tom_serialization
 
 
 class State(Enum):
@@ -32,35 +17,28 @@ class State(Enum):
 
 pg.init()
 pg.display.set_caption("tom")
-screen = pg.display.set_mode((WIDTH, HEIGHT))
+screen = pg.display.set_mode((tom_params.WIDTH, tom_params.HEIGHT))
 
-try:
-    with tarfile.open("save.tom", "r:gz") as tar:
-        cam = Camera.load(json.load(tar.extractfile("camera.json")))
-        images = ImageNetwork.load(json.load(tar.extractfile("network.json")), cam)
-
-except FileNotFoundError:
-    cam = Camera.empty()
-    images = ImageNetwork.empty()
+cam, images = tom_serialization.load()
 
 search_box = SearchBox(
-    pos=Vec2(WIDTH/2, HEIGHT/2),
-    size=Vec2(WIDTH / 2, HEIGHT / 12),
+    pos=Vec2(tom_params.WIDTH/2, tom_params.HEIGHT/2),
+    size=Vec2(tom_params.WIDTH / 2, tom_params.HEIGHT / 12),
     font=pg.font.SysFont("Calibri", 24),
     partial="",
-    root=ROOT,
+    root=tom_params.ROOT,
     path=[],
-    candidates=[n for n in sorted(os.listdir(ROOT))],
-    color_text=COLOR_TEXT,
+    candidates=[n for n in sorted(os.listdir(tom_params.ROOT))],
+    color_text=tom_colors.TEXT,
     result=None
 )
 
 state = State.TRAVEL
-color_bg = COLOR_BG_TRAVEL
-opaque = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
+color_bg = tom_colors.BG_TRAVEL
+opaque = pg.Surface((tom_params.WIDTH, tom_params.HEIGHT), pg.SRCALPHA)
 opaque.fill("#000000")
 opaque.set_alpha(100)
-blur = pg.Surface((WIDTH, HEIGHT))
+blur = pg.Surface((tom_params.WIDTH, tom_params.HEIGHT))
 while True:
     for event in pg.event.get():
 
@@ -73,10 +51,10 @@ while True:
                 search_box.listen(event)
                 if search_box.result is not None:
                     srf = pg.image.load(search_box.result).convert_alpha()
-                    images.add(search_box.result, srf, WIDTH, HEIGHT, cam)
+                    images.add(search_box.result, srf, tom_params.WIDTH, tom_params.HEIGHT, cam)
                     search_box.result = None
                     state = State.MOVE
-                    color_bg = COLOR_BG_MOVE
+                    color_bg = tom_colors.BG_MOVE
 
         if event.type == pg.MOUSEWHEEL:
             images.update(cam)
@@ -85,23 +63,14 @@ while True:
             if event.key == pg.K_s and state != State.SEARCH:
                 state = State.SEARCH
                 blur = pg.transform.gaussian_blur(screen, 20)
-                color_bg = COLOR_BG_SEARCH
+                color_bg = tom_colors.BG_SEARCH
             if event.key == pg.K_ESCAPE:
             #if event.key == pg.K_s or event.key == pg.K_ESCAPE:
                 #if event.key == pg.K_s:
                 #    pg.image.save(screen, "tom.png")
-                # Save state
-                with tarfile.open("save.tom", "w:gz") as tar:
-                    # Camera
-                    data = BytesIO(json.dumps(cam.dump(), indent=4).encode("utf-8"))
-                    meta = tarfile.TarInfo("camera.json")
-                    meta.size = data.getbuffer().nbytes
-                    tar.addfile(meta, data)
-                    # Network
-                    data = BytesIO(json.dumps(images.dump(), indent=4).encode("utf-8"))
-                    meta = tarfile.TarInfo("network.json")
-                    meta.size = data.getbuffer().nbytes
-                    tar.addfile(meta, data)
+
+                tom_serialization.dump(cam, images)
+
                 pg.quit()
                 exit()
 
