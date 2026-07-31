@@ -76,13 +76,11 @@ class ImageNetwork:
             })
         return d
 
+    def update(self, cam):
+        for i in range(self.count):
+            self.srf_on[i] = pg.transform.smoothscale_by(self.srf_off[i], cam.z * self.srf_zoom[i])
 
     def listen(self, event, cam):
-
-        if event.type == pg.MOUSEWHEEL and not self.focused:
-            for i in range(self.count):
-                self.srf_on[i] = pg.transform.smoothscale_by(self.srf_off[i], cam.z * self.srf_zoom[i])
-
         if event.type == pg.MOUSEWHEEL and self.focused:
             x, y = pg.mouse.get_pos()
             cur_proj = cam.posabs(Vec2(x, y))

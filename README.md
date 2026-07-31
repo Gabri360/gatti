@@ -19,7 +19,7 @@ Ideally this program's functionality will be limited to: *displaying*, *arrangin
 # Patch Notes
 
 ## New
-Remove images with `x` and screenshot the whole display with `s`.
+Remove images with `x`, screenshot with `s` has been removed.
 
 ## Upcoming
 1. Improve the search box.

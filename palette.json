@@ -1,4 +1,6 @@
 {
-    "background": "#222522",
+    "background-travel": "#272222",
+    "background-move": "#222722",
+    "background-search": "#222227",
     "text": "#ffffff"
 }
