@@ -114,7 +114,8 @@ class TomBoard:
 
                     # the mouse cursor is used as the center of the zoom (fixed point)
                     cur_proj = tm.absto(tm.Vec2(*pg.mouse.get_pos()), self.cam_pos, self.cam_scale)
-                    self.img_pos[self.ifoc] = tm.absto(self.img_pos[self.ifoc] - cur_proj, cur_proj, 1.0 - event.y * 0.05)
+                    img_pos_rel = self.img_pos[self.ifoc] - cur_proj
+                    self.img_pos[self.ifoc] = tm.absto(img_pos_rel, cur_proj, 1.0 - event.y * 0.05)
                     self.img_scale[self.ifoc] /= 1.0 - event.y * 0.05
                     self.img_size_on[self.ifoc] = self.img_size_off[self.ifoc] * self.img_scale[self.ifoc]
 
@@ -133,11 +134,13 @@ class TomBoard:
                     self.img_scale.pop(self.ifoc)
                     self.img_count -= 1
 
-                # transition events
+                # check for transition events, they are triggered by a keyboard press
                 if event.type == pg.KEYDOWN:
+
                     # switch to searching if the S key is pressed
                     if event.key == pg.K_s:
                         return ts.TomState.SEARCH
+
                     # exit program if the ESC key is pressed
                     if event.key == pg.K_ESCAPE:
                         return ts.TomState.EXIT
