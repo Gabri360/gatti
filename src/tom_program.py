@@ -35,7 +35,9 @@ class TomProgram:
                     # entering the SEARCH state and waiting for termination to read transition
                     state = self.search.run(mnt, screen, pg.font.SysFont("Calibri", 24), bg, tm.Vec2(*screen.get_size()) / 2)
 
+                    # transition from search query to board
                     if state == TomState.BOARD:
+
                         # load the searched image
                         path = mnt + '/'.join(self.search.walk)
                         srf = pg.image.load(path).convert_alpha()

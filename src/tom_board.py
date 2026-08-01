@@ -11,6 +11,7 @@ class TomBoard:
     # Variables (camera)
     cam_pos: tm.Vec2
     cam_scale: float
+
     # Variables (images)
     img_count: int
     img_path: list[str]
@@ -56,59 +57,72 @@ class TomBoard:
         while running:
             for event in pg.event.get():
 
-                # globally pan the environment
+                # globally pan the environment if no image is left clicked or by arbitrary right click
                 if event.type == pg.MOUSEMOTION and ((event.buttons[0] and self.ifoc == self.img_count) or event.buttons[2]):
                     self.cam_pos -= tm.Vec2(*event.rel) / self.cam_scale
 
-                # globally scale the environment using the mouse cursor as a fixed point
+                # globally scale the environment if no image is focused
                 elif event.type == pg.MOUSEWHEEL and self.ifoc == self.img_count:
+
+                    # the mouse cursor is used as the center of the zoom (fixed point)
                     dz = 1.0 - event.y * 0.05
                     self.cam_pos += tm.Vec2(*pg.mouse.get_pos()) * (1 - dz) / self.cam_scale
                     self.cam_scale /= dz
 
-                # unfocus an image
+                    # update the scales globally
+                    for i in range(self.img_count):
+                        scale_total = self.cam_scale * self.img_scale[i]
+                        self.img_srf_on[i] = pg.transform.smoothscale_by(self.img_srf_off[i], scale_total)
+
+                # unfocus an image by right click
                 if event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
                     self.ifoc = self.img_count
                     bg_color = tc.BG_TRAVEL
 
-                # focus an image
+                # focus an image by left click
                 elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+
+                    # if the cursor isn't clicking an image set the focus out of scale
                     self.ifoc = self.img_count
                     bg_color = tc.BG_TRAVEL
+
+                    # check if cursor (projected into the image space) is contained inside any image
                     for i in reversed(range(0, self.img_count)):
                         cur_proj = tm.absto(tm.Vec2(*event.pos), self.cam_pos, self.cam_scale)
-                        # check if cursor is contained inside the image
                         if (self.img_pos[i].x < cur_proj.x < self.img_pos[i].x + self.img_size_on[i].x and
                             self.img_pos[i].y < cur_proj.y < self.img_pos[i].y + self.img_size_on[i].y):
-                            self.ifoc = i
+
                             # push focused image to the top layer
-                            self.img_pos.append(self.img_pos.pop(self.ifoc))
-                            self.img_path.append(self.img_path.pop(self.ifoc))
-                            self.img_srf_on.append(self.img_srf_on.pop(self.ifoc))
-                            self.img_srf_off.append(self.img_srf_off.pop(self.ifoc))
-                            self.img_size_on.append(self.img_size_on.pop(self.ifoc))
-                            self.img_size_off.append(self.img_size_off.pop(self.ifoc))
-                            self.img_scale.append(self.img_scale.pop(self.ifoc))
+                            self.img_pos.append(self.img_pos.pop(i))
+                            self.img_path.append(self.img_path.pop(i))
+                            self.img_srf_on.append(self.img_srf_on.pop(i))
+                            self.img_srf_off.append(self.img_srf_off.pop(i))
+                            self.img_size_on.append(self.img_size_on.pop(i))
+                            self.img_size_off.append(self.img_size_off.pop(i))
+                            self.img_scale.append(self.img_scale.pop(i))
+
                             self.ifoc = self.img_count - 1
                             bg_color = tc.BG_MOVE
                             break
 
-                # pan an image
+                # pan an image by the dragged distance if an image is focused and the cursor is dragging
                 elif self.ifoc < self.img_count and event.type == pg.MOUSEMOTION and event.buttons[0]:
                     self.img_pos[self.ifoc] += tm.Vec2(*event.rel) / self.cam_scale
 
-                # scale an image using the mouse cursor as a fixed point
+                # scale the image if an image is foucsed and the mouse-wheel is rolling
                 elif self.ifoc < self.img_count and event.type == pg.MOUSEWHEEL:
+
+                    # the mouse cursor is used as the center of the zoom (fixed point)
                     cur_proj = tm.absto(tm.Vec2(*pg.mouse.get_pos()), self.cam_pos, self.cam_scale)
-                    self.img_pos[self.ifoc] -= cur_proj
+                    self.img_pos[self.ifoc] = tm.absto(self.img_pos[self.ifoc] - cur_proj, cur_proj, 1.0 - event.y * 0.05)
                     self.img_scale[self.ifoc] /= 1.0 - event.y * 0.05
                     self.img_size_on[self.ifoc] = self.img_size_off[self.ifoc] * self.img_scale[self.ifoc]
-                    self.img_pos[self.ifoc] /= 1.0 - event.y * 0.05
-                    self.img_pos[self.ifoc] += cur_proj
-                    scale_total = self.cam_scale * self.img_scale[self.ifoc]
+
+                    # update local scale
+                    scale_total = self.cam_scale * self.img_scale[i]
                     self.img_srf_on[self.ifoc] = pg.transform.smoothscale_by(self.img_srf_off[self.ifoc], scale_total)
 
-                # remove an image
+                # delete the image if an image is focused and the X key is pressed
                 elif self.ifoc < self.img_count and event.type == pg.KEYDOWN and event.key == pg.K_x:
                     self.img_path.pop(self.ifoc)
                     self.img_srf_on.pop(self.ifoc)
@@ -119,18 +133,12 @@ class TomBoard:
                     self.img_scale.pop(self.ifoc)
                     self.img_count -= 1
 
-                # if either local or global scaling is performed then cache the results
-                if event.type == pg.MOUSEWHEEL:
-                    for i in range(self.img_count):
-                        scale_total = self.cam_scale * self.img_scale[i]
-                        self.img_srf_on[i] = pg.transform.smoothscale_by(self.img_srf_off[i], scale_total)
-
                 # transition events
                 if event.type == pg.KEYDOWN:
-                    # switch to searching
+                    # switch to searching if the S key is pressed
                     if event.key == pg.K_s:
                         return ts.TomState.SEARCH
-                    # exit program
+                    # exit program if the ESC key is pressed
                     if event.key == pg.K_ESCAPE:
                         return ts.TomState.EXIT
 
