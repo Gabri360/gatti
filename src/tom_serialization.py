@@ -1,14 +1,11 @@
-import json
 import pygame as pg
-from io import BytesIO
-import tarfile
-from .tom_math import Vec2
+from . import tom_math as tm
 
 
 def load_program(prog, data_cam, data_img):
 
     # loading camera data
-    prog.board.cam_pos = Vec2(data_cam["position"]["x"], data_cam["position"]["y"])
+    prog.board.cam_pos = tm.Vec2(data_cam["position"]["x"], data_cam["position"]["y"])
     prog.board.cam_scale = data_cam["scale"]
 
     # loading image data
@@ -16,7 +13,7 @@ def load_program(prog, data_cam, data_img):
         prog.board.add(
             path=img["path"],
             srf=pg.image.load(img["path"]).convert_alpha(),
-            pos=Vec2(img["position"]["x"], img["position"]["y"]),
+            pos=tm.Vec2(img["position"]["x"], img["position"]["y"]),
             scale=img["scale"]
         )
 

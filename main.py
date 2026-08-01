@@ -10,15 +10,20 @@ from src import tom_program
 from src import tom_serialization
 
 
+# protect script from getting imported
 if __name__ != "__main__":
     print("This python script shouldn't be imported")
     exit()
 
 
+# initialize graphics library and windowing
 pg.init()
 pg.display.set_caption("tom")
 screen = pg.display.set_mode((tom_params.WIDTH, tom_params.HEIGHT))
+
+# initialize blank program
 prog = tom_program.TomProgram.empty()
+
 
 try:
     # supply the last save as the one to be loaded
@@ -55,13 +60,17 @@ prog.run(tom_params.ROOT, screen)
 
 # saving the latest program state
 with tarfile.open(path_save, "w:gz") as tar:
+
+    # dump program state
     save = tom_serialization.dump_program(prog)
-    # Camera
+
+    # dump CAMERA state onto a json (virtual)
     data = BytesIO(json.dumps(save["camera"], indent=4).encode("utf-8"))
     meta = tarfile.TarInfo("camera.json")
     meta.size = data.getbuffer().nbytes
     tar.addfile(meta, data)
-    # Network
+
+    # dump BOARD state onto a json (virtual)
     data = BytesIO(json.dumps(save["board"], indent=4).encode("utf-8"))
     meta = tarfile.TarInfo("board.json")
     meta.size = data.getbuffer().nbytes

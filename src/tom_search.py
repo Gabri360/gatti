@@ -1,6 +1,7 @@
-from dataclasses import dataclass, astuple
 import os
 import pygame as pg
+from dataclasses import dataclass, astuple
+
 from . import tom_math as tm
 from . import tom_colors as tc
 from . import tom_state as ts
