@@ -1,3 +1,5 @@
+![demo][/demo.jpg]
+
 # Introduction
 Ideally this program's functionality will be limited to: *displaying*, *arranging*, *grouping*, and *commenting* images.
 
