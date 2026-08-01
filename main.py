@@ -1,84 +1,76 @@
-import os
+import json
+import tarfile
 import pygame as pg
-from enum import Enum, auto
-from search_box import SearchBox
-from image_network import ImageNetwork
-from camera import Camera, Vec2
-import tom_colors
-import tom_params
-import tom_serialization
+
+from io import BytesIO
+from sys import argv
+
+from src import tom_params
+from src import tom_program
+from src import tom_serialization
 
 
-class State(Enum):
-    TRAVEL = auto()
-    MOVE = auto()
-    SEARCH = auto()
+if __name__ != "__main__":
+    print("This python script shouldn't be imported")
+    exit()
 
 
 pg.init()
 pg.display.set_caption("tom")
 screen = pg.display.set_mode((tom_params.WIDTH, tom_params.HEIGHT))
+prog = tom_program.TomProgram.empty()
 
-cam, images = tom_serialization.load()
+try:
+    # supply the last save as the one to be loaded
+    if len(argv) == 1:
+        try:
+            with open(".save", "r") as file:
+                path_save = file.read()
+        except FileNotFoundError:
+            print("No previous instance was found, please supply an argument")
+            exit()
 
-search_box = SearchBox(
-    pos=Vec2(tom_params.WIDTH/2, tom_params.HEIGHT/2),
-    size=Vec2(tom_params.WIDTH / 2, tom_params.HEIGHT / 12),
-    font=pg.font.SysFont("Calibri", 24),
-    partial="",
-    root=tom_params.ROOT,
-    path=[],
-    candidates=[n for n in sorted(os.listdir(tom_params.ROOT))],
-    color_text=tom_colors.TEXT,
-    result=None
-)
+    # supply the save specified in the argument as the one to be loaded
+    elif len(argv) == 2:
+        path_save = argv[1]
 
-state = State.TRAVEL
-color_bg = tom_colors.BG_TRAVEL
-opaque = pg.Surface((tom_params.WIDTH, tom_params.HEIGHT), pg.SRCALPHA)
-opaque.fill("#000000")
-opaque.set_alpha(100)
-blur = pg.Surface((tom_params.WIDTH, tom_params.HEIGHT))
-while True:
-    for event in pg.event.get():
+    # to many arguments
+    elif len(argv) > 2:
+        print("To many arguments were supplied")
+        exit()
 
-        match state:
-            case State.TRAVEL:
-                cam.listen(event)
-            case State.MOVE:
-                images.listen(event, cam)
-            case State.SEARCH:
-                search_box.listen(event)
-                if search_box.result is not None:
-                    srf = pg.image.load(search_box.result).convert_alpha()
-                    images.add(search_box.result, srf, tom_params.WIDTH, tom_params.HEIGHT, cam)
-                    search_box.result = None
-                    state = State.MOVE
-                    color_bg = tom_colors.BG_MOVE
+    # loading supplied save
+    with tarfile.open(path_save, "r:gz") as tar:
+        data_cam = json.load(tar.extractfile("camera.json"))
+        data_img = json.load(tar.extractfile("board.json"))
+        tom_serialization.load_program(prog, data_cam, data_img)
 
-        if event.type == pg.MOUSEWHEEL:
-            images.update(cam)
+except FileNotFoundError:
+    # create a save using the supplied argument
+    print(f"Couldn't find {path_save}, creating a new instance")
 
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_s and state != State.SEARCH:
-                state = State.SEARCH
-                blur = pg.transform.gaussian_blur(screen, 20)
-                color_bg = tom_colors.BG_SEARCH
-            if event.key == pg.K_ESCAPE:
-            #if event.key == pg.K_s or event.key == pg.K_ESCAPE:
-                #if event.key == pg.K_s:
-                #    pg.image.save(screen, "tom.png")
 
-                tom_serialization.dump(cam, images)
+prog.run(tom_params.ROOT, screen)
 
-                pg.quit()
-                exit()
 
-    screen.fill(color_bg)
-    images.draw(screen, cam)
-    if state == State.SEARCH:
-        screen.blit(blur, (0, 0))
-        screen.blit(opaque, (0, 0))
-        search_box.draw(screen)
+# saving the latest program state
+with tarfile.open(path_save, "w:gz") as tar:
+    save = tom_serialization.dump_program(prog)
+    # Camera
+    data = BytesIO(json.dumps(save["camera"], indent=4).encode("utf-8"))
+    meta = tarfile.TarInfo("camera.json")
+    meta.size = data.getbuffer().nbytes
+    tar.addfile(meta, data)
+    # Network
+    data = BytesIO(json.dumps(save["board"], indent=4).encode("utf-8"))
+    meta = tarfile.TarInfo("board.json")
+    meta.size = data.getbuffer().nbytes
+    tar.addfile(meta, data)
 
-    pg.display.update()
+# save last program instance identifier
+with open(".save", "w") as file:
+    file.write(path_save)
+
+
+pg.quit()
+exit()
