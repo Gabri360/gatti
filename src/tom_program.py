@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import pygame as pg
 from enum import Enum, auto
-from .tom_math import Vec2, absto
+from . import tom_math as tm
 from .tom_board import TomBoard
 from .tom_search import TomSearch
 from .tom_state import TomState
@@ -32,13 +32,14 @@ class TomProgram:
                     layer.fill("#000000")
                     layer.set_alpha(100)
                     bg.blit(layer, (0, 0))
-                    state = self.search.run(mnt, screen, pg.font.SysFont("Calibri", 24), bg, Vec2(*screen.get_size()) / 2)
+                    state = self.search.run(mnt, screen, pg.font.SysFont("Calibri", 24), bg, tm.Vec2(*screen.get_size()) / 2)
                     if state == TomState.BOARD:
                         # add searched image at the relative center of the board
                         path = mnt + '/'.join(self.search.walk)
                         srf = pg.image.load(path).convert_alpha()
                         scale = 0.5 * screen.get_width() / (srf.get_width() * self.board.cam_scale)
-                        pos = (Vec2(*screen.get_size()) - Vec2(*srf.get_size())  * scale) / 2
+                        pos = tm.absto((tm.Vec2(*screen.get_size()) - tm.Vec2(*srf.get_size())  * scale * self.board.cam_scale) / 2, self.board.cam_pos, self.board.cam_scale)
+                        print(pos)
                         self.board.add(path, srf, pos, scale)
                         self.search.part = ""
                         self.search.walk.pop()
