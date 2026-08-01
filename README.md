@@ -49,7 +49,7 @@ elif event.type == pg.MOUSEMOTION and event.buttons[0]:
 ```
 the *bug* originates from the fact that mouse cursor check is done before the displacement, a possible fix is for the cursor check to happen with respect to the final position of the image instead.
 * The gaussian blur implementation `pg.transform.gaussian_blur` is painfully slow.
-
+* Elements outside of the scope still get rescaled, the performance is terrible.
 
 # Developers
 This section is reserved to...

@@ -33,9 +33,9 @@ class TomSearch:
                 elif event.key == pg.K_RETURN:
                     self.part = [n for n in self.hint if self.part in n[:len(self.part)]][0]
                     self.walk.append(self.part)
+                    self.part = ""
                     path = mnt + '/'.join(self.walk)
                     if os.path.isdir(path):
-                        self.part = ""
                         self.hint = [n for n in sorted(os.listdir(path))]
                     # transition event
                     else:

@@ -1,12 +1,10 @@
-from dataclasses import dataclass
 import pygame as pg
-from enum import Enum, auto
+from dataclasses import dataclass
+
 from . import tom_math as tm
 from .tom_board import TomBoard
 from .tom_search import TomSearch
 from .tom_state import TomState
-from . import tom_colors
-from . import tom_params
 
 
 @dataclass(slots=True)
@@ -22,29 +20,36 @@ class TomProgram:
         state = TomState.BOARD
         while True:
             match state:
-
                 case TomState.BOARD:
+                    # entering the BOARD state and waiting for termination to read transition
                     state = self.board.run(screen)
 
                 case TomState.SEARCH:
+                    # screenshot the board, blur and and darken it and use it as background
                     bg = pg.transform.gaussian_blur(screen, 20)
                     layer = pg.Surface(screen.get_size())
                     layer.fill("#000000")
                     layer.set_alpha(100)
                     bg.blit(layer, (0, 0))
+
+                    # entering the SEARCH state and waiting for termination to read transition
                     state = self.search.run(mnt, screen, pg.font.SysFont("Calibri", 24), bg, tm.Vec2(*screen.get_size()) / 2)
+
                     if state == TomState.BOARD:
-                        # add searched image at the relative center of the board
+                        # load the searched image
                         path = mnt + '/'.join(self.search.walk)
                         srf = pg.image.load(path).convert_alpha()
-                        scale = 0.5 * screen.get_width() / (srf.get_width() * self.board.cam_scale)
-                        pos = tm.absto((tm.Vec2(*screen.get_size()) - tm.Vec2(*srf.get_size())  * scale * self.board.cam_scale) / 2, self.board.cam_pos, self.board.cam_scale)
-                        print(pos)
-                        self.board.add(path, srf, pos, scale)
-                        self.search.part = ""
+
+                        # add image to center of the board with half-screen-width scale
+                        scale_rel = 0.5 * screen.get_width() / srf.get_width()
+                        scale_abs = scale_rel / self.board.cam_scale
+                        pos_rel = (tm.Vec2(*screen.get_size()) - tm.Vec2(*srf.get_size())  * scale_rel) / 2
+                        pos_abs = tm.absto(pos_rel, self.board.cam_pos, self.board.cam_scale)
+                        self.board.add(path, srf, pos_abs, scale_abs)
+
+                        # prepare next query
                         self.search.walk.pop()
 
-                    state = TomState.BOARD
-
                 case TomState.EXIT:
+                    # exit the program
                     break
