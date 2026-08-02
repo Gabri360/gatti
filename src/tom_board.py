@@ -120,7 +120,7 @@ class TomBoard:
                     self.img_size_on[self.ifoc] = self.img_size_off[self.ifoc] * self.img_scale[self.ifoc]
 
                     # update local scale
-                    scale_total = self.cam_scale * self.img_scale[i]
+                    scale_total = self.cam_scale * self.img_scale[self.ifoc]
                     self.img_srf_on[self.ifoc] = pg.transform.smoothscale_by(self.img_srf_off[self.ifoc], scale_total)
 
                 # delete the image if an image is focused and the X key is pressed
@@ -148,9 +148,20 @@ class TomBoard:
             # draw background
             screen.fill(bg_color)
 
-            # draw images
-            for i in range(self.img_count):
-                img_pos_rel = tm.relto(self.img_pos[i], self.cam_pos, self.cam_scale)
-                screen.blit(self.img_srf_on[i], astuple(img_pos_rel))
+            # draw unfocused images
+            for i in range(0, self.ifoc):
+                pos_screen = tm.relto(self.img_pos[i], self.cam_pos, self.cam_scale)
+                screen.blit(self.img_srf_on[i], astuple(pos_screen))
+
+            for i in range(self.ifoc + 1, self.img_count):
+                pos_screen = tm.relto(self.img_pos[i], self.cam_pos, self.cam_scale)
+                screen.blit(self.img_srf_on[i], astuple(pos_screen))
+
+            # focused image is drawn with a lower opacity
+            if self.ifoc < self.img_count:
+                pos_screen = tm.relto(self.img_pos[self.ifoc], self.cam_pos, self.cam_scale)
+                self.img_srf_on[self.ifoc].set_alpha(100)
+                screen.blit(self.img_srf_on[self.ifoc], astuple(pos_screen))
+                self.img_srf_on[self.ifoc].set_alpha(255)
         
             pg.display.update()
