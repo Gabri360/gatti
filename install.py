@@ -44,7 +44,7 @@ if len(argv) == 1:
 
     # Install 'executable'
     with open("/usr/local/bin/tom", "w") as file:
-        call(["echo", "-e", "/usr/local/lib/tom/venv/bin/python -BO /usr/local/src/tom/main.py"], stdout=file)
+        call(["echo", "-e", "/usr/local/lib/tom/venv/bin/python -BO /usr/local/src/tom/main.py $@"], stdout=file)
     call(["chmod", "+x", "/usr/local/bin/tom"])
 
 
