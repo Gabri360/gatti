@@ -2,6 +2,7 @@ import pygame as pg
 from dataclasses import dataclass
 
 import tom_math as tm
+import tom_colors as tc
 from tom_board import TomBoard
 from tom_search import TomSearch
 from tom_state import TomState
@@ -28,7 +29,7 @@ class TomProgram:
                     # screenshot the board, blur and and darken it and use it as background
                     bg = pg.transform.gaussian_blur(screen, 20)
                     layer = pg.Surface(screen.get_size())
-                    layer.fill("#000000")
+                    layer.fill(tc.BG_SEARCH)
                     layer.set_alpha(100)
                     bg.blit(layer, (0, 0))
 
