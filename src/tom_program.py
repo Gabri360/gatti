@@ -1,10 +1,10 @@
 import pygame as pg
 from dataclasses import dataclass
 
-from . import tom_math as tm
-from .tom_board import TomBoard
-from .tom_search import TomSearch
-from .tom_state import TomState
+import tom_math as tm
+from tom_board import TomBoard
+from tom_search import TomSearch
+from tom_state import TomState
 
 
 @dataclass(slots=True)
@@ -16,7 +16,7 @@ class TomProgram:
     def empty(cls):
         return cls(TomBoard.empty(), TomSearch.empty())
 
-    def run(self, mnt, screen):
+    def run(self, screen):
         state = TomState.BOARD
         while True:
             match state:
@@ -33,13 +33,13 @@ class TomProgram:
                     bg.blit(layer, (0, 0))
 
                     # entering the SEARCH state and waiting for termination to read transition
-                    state = self.search.run(mnt, screen, pg.font.SysFont("Calibri", 24), bg, tm.Vec2(*screen.get_size()) / 2)
+                    state = self.search.run(screen, pg.font.SysFont("Calibri", 24), bg, tm.Vec2(*screen.get_size()) / 2)
 
                     # transition from search query to board
                     if state == TomState.BOARD:
 
                         # load the searched image
-                        path = mnt + '/'.join(self.search.walk)
+                        path = '/'.join(self.search.walk)
                         srf = pg.image.load(path).convert_alpha()
 
                         # add image to center of the board with half-screen-width scale

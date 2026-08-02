@@ -1,7 +1,8 @@
 import json
+import tom_params as tp
 
 
-with open("config/palette.json", "r") as file:
+with open(tp.THEME, "r") as file:
     palette = json.load(file)
     BG_TRAVEL = palette["background-travel"]
     BG_MOVE = palette["background-move"]

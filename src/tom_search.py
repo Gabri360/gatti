@@ -2,9 +2,9 @@ import os
 import pygame as pg
 from dataclasses import dataclass, astuple
 
-from . import tom_math as tm
-from . import tom_colors as tc
-from . import tom_state as ts
+import tom_math as tm
+import tom_colors as tc
+import tom_state as ts
 
 
 @dataclass(slots=True)
@@ -17,10 +17,10 @@ class TomSearch:
     def empty(cls):
         return cls(part="", walk=[], hint=[])
 
-    def run(self, mnt, screen, font, bg, pos):
+    def run(self, screen, font, bg, pos):
 
         # generate hints
-        self.hint = sorted(os.listdir(mnt + '/'.join(self.walk)))
+        self.hint = sorted(os.listdir(os.path.abspath('/'.join(self.walk))))
 
         while True:
             for event in pg.event.get():
@@ -42,7 +42,7 @@ class TomSearch:
                     self.part = ""
 
                     # transition to the BOARD if the walk can no longer be extended otherwise generate new hints
-                    path = mnt + '/'.join(self.walk)
+                    path = '/'.join(self.walk)
                     if not os.path.isdir(path):
                         return ts.TomState.BOARD
                     else:

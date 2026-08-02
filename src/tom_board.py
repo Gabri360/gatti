@@ -1,9 +1,9 @@
 import pygame as pg
 from dataclasses import dataclass, astuple
 
-from . import tom_colors as tc
-from . import tom_state as ts
-from . import tom_math as tm
+import tom_colors as tc
+import tom_state as ts
+import tom_math as tm
 
 
 @dataclass(slots=True)

@@ -5,9 +5,10 @@ import pygame as pg
 from io import BytesIO
 from sys import argv
 
-from src import tom_params
-from src import tom_program
-from src import tom_serialization
+import tom_params as tp
+from tom_program import TomProgram
+from tom_serialization import load_program
+from tom_serialization import dump_program
 
 
 # protect script from getting imported
@@ -19,10 +20,10 @@ if __name__ != "__main__":
 # initialize graphics library and windowing
 pg.init()
 pg.display.set_caption("tom")
-screen = pg.display.set_mode((tom_params.WIDTH, tom_params.HEIGHT))
+screen = pg.display.set_mode((tp.WIDTH, tp.HEIGHT))
 
 # initialize blank program
-prog = tom_program.TomProgram.empty()
+prog = TomProgram.empty()
 
 
 try:
@@ -48,21 +49,21 @@ try:
     with tarfile.open(path_save, "r:gz") as tar:
         data_cam = json.load(tar.extractfile("camera.json"))
         data_img = json.load(tar.extractfile("board.json"))
-        tom_serialization.load_program(prog, data_cam, data_img)
+        load_program(prog, data_cam, data_img)
 
 except FileNotFoundError:
     # create a save using the supplied argument
     print(f"Couldn't find {path_save}, creating a new instance")
 
 
-prog.run(tom_params.ROOT, screen)
+prog.run(screen)
 
 
 # saving the latest program state
 with tarfile.open(path_save, "w:gz") as tar:
 
     # dump program state
-    save = tom_serialization.dump_program(prog)
+    save = dump_program(prog)
 
     # dump CAMERA state onto a json (virtual)
     data = BytesIO(json.dumps(save["camera"], indent=4).encode("utf-8"))

@@ -1,5 +1,5 @@
 import pygame as pg
-from . import tom_math as tm
+import tom_math as tm
 
 
 def load_program(prog, data_cam, data_img):
