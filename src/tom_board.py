@@ -16,6 +16,7 @@ class TomBoard:
     img_count: int
     img_path: list[str]
     img_pos: list[tm.Vec2]
+    img_crop_pos: list[tm.Vec2]
     img_srf_on: list[pg.Surface]
     img_srf_off: list[pg.Surface]
     img_size_on: list[tm.Vec2]
@@ -31,6 +32,7 @@ class TomBoard:
             img_count=0,
             img_path=[],
             img_pos=[],
+            img_crop_pos=[],
             img_srf_on=[],
             img_srf_off=[],
             img_size_on=[],
@@ -42,12 +44,40 @@ class TomBoard:
     def add(self, path, srf, pos, scale):
         self.img_path.append(path)
         self.img_pos.append(pos)
+        self.img_crop_pos.append(tm.Vec2(0, 0))
         self.img_srf_on.append(pg.transform.smoothscale_by(srf, scale * self.cam_scale))
         self.img_srf_off.append(srf)
         self.img_size_on.append(tm.Vec2(*srf.get_size()) * scale)
         self.img_size_off.append(tm.Vec2(*srf.get_size()))
         self.img_scale.append(scale)
         self.img_count += 1
+
+    def refit(self, iimg, screen):
+
+        # edge-edge description of image screen-rectangle (north-west and south-east)
+        pos_nw = tm.relto(self.img_pos[iimg], self.cam_pos, self.cam_scale)
+        pos_se = pos_nw + self.img_size_on[iimg] * self.cam_scale
+
+        # project rectangle edges onto nearest screen edge
+        pos_nw_clip = tm.minmax(tm.Vec2(0, 0), pos_nw, tm.Vec2(*screen.get_size()))
+        pos_se_clip = tm.minmax(tm.Vec2(0, 0), pos_se, tm.Vec2(*screen.get_size()))
+
+        # edge-lenght description of image absolute-rectangle before scaling
+        scale_total = self.cam_scale * self.img_scale[iimg]
+        pos_clip = (pos_nw_clip - pos_nw) / scale_total
+        size_clip = (pos_se_clip - pos_nw_clip) / scale_total
+        rect = (
+            min(pos_clip.x, self.img_size_off[iimg].x),
+            min(pos_clip.y, self.img_size_off[iimg].y),
+            max(size_clip.x, 0),
+            max(size_clip.y, 0)
+        )
+
+        # image rectangle absolute edge after scaling
+        self.img_crop_pos[iimg] = pos_clip * self.img_scale[iimg]
+
+        # image portion that is out-of-scope is cropped away then the remaining is scaled
+        self.img_srf_on[iimg] = pg.transform.smoothscale_by(self.img_srf_off[iimg].subsurface(rect), scale_total)
 
     def run(self, screen):
 
@@ -61,6 +91,9 @@ class TomBoard:
                 if event.type == pg.MOUSEMOTION and ((event.buttons[0] and self.ifoc == self.img_count) or event.buttons[2]):
                     self.cam_pos -= tm.Vec2(*event.rel) / self.cam_scale
 
+                    for i in range(self.img_count):
+                        self.refit(i, screen)
+
                 # globally scale the environment if no image is focused
                 elif event.type == pg.MOUSEWHEEL and self.ifoc == self.img_count:
 
@@ -69,10 +102,8 @@ class TomBoard:
                     self.cam_pos += tm.Vec2(*pg.mouse.get_pos()) * (1 - dz) / self.cam_scale
                     self.cam_scale /= dz
 
-                    # update the scales globally
                     for i in range(self.img_count):
-                        scale_total = self.cam_scale * self.img_scale[i]
-                        self.img_srf_on[i] = pg.transform.smoothscale_by(self.img_srf_off[i], scale_total)
+                        self.refit(i, screen)
 
                 # unfocus an image by right click
                 if event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
@@ -108,6 +139,7 @@ class TomBoard:
                 # pan an image by the dragged distance if an image is focused and the cursor is dragging
                 elif self.ifoc < self.img_count and event.type == pg.MOUSEMOTION and event.buttons[0]:
                     self.img_pos[self.ifoc] += tm.Vec2(*event.rel) / self.cam_scale
+                    self.refit(self.ifoc, screen)
 
                 # scale the image if an image is foucsed and the mouse-wheel is rolling
                 elif self.ifoc < self.img_count and event.type == pg.MOUSEWHEEL:
@@ -119,9 +151,8 @@ class TomBoard:
                     self.img_scale[self.ifoc] /= 1.0 - event.y * 0.05
                     self.img_size_on[self.ifoc] = self.img_size_off[self.ifoc] * self.img_scale[self.ifoc]
 
-                    # update local scale
-                    scale_total = self.cam_scale * self.img_scale[self.ifoc]
-                    self.img_srf_on[self.ifoc] = pg.transform.smoothscale_by(self.img_srf_off[self.ifoc], scale_total)
+                    # update the scales locally
+                    self.refit(self.ifoc, screen)
 
                 # delete the image if an image is focused and the X key is pressed
                 elif self.ifoc < self.img_count and event.type == pg.KEYDOWN and event.key == pg.K_x:
@@ -150,16 +181,16 @@ class TomBoard:
 
             # draw unfocused images
             for i in range(0, self.ifoc):
-                pos_screen = tm.relto(self.img_pos[i], self.cam_pos, self.cam_scale)
+                pos_screen = tm.relto(self.img_pos[i] + self.img_crop_pos[i], self.cam_pos, self.cam_scale)
                 screen.blit(self.img_srf_on[i], astuple(pos_screen))
 
             for i in range(self.ifoc + 1, self.img_count):
-                pos_screen = tm.relto(self.img_pos[i], self.cam_pos, self.cam_scale)
+                pos_screen = tm.relto(self.img_pos[i] + self.img_crop_pos[i], self.cam_pos, self.cam_scale)
                 screen.blit(self.img_srf_on[i], astuple(pos_screen))
 
             # focused image is drawn with a lower opacity
             if self.ifoc < self.img_count:
-                pos_screen = tm.relto(self.img_pos[self.ifoc], self.cam_pos, self.cam_scale)
+                pos_screen = tm.relto(self.img_pos[self.ifoc] + self.img_crop_pos[self.ifoc], self.cam_pos, self.cam_scale)
                 self.img_srf_on[self.ifoc].set_alpha(100)
                 screen.blit(self.img_srf_on[self.ifoc], astuple(pos_screen))
                 self.img_srf_on[self.ifoc].set_alpha(255)
