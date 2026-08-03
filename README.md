@@ -9,6 +9,7 @@ Images are queried from a *search bar* and loaded onto an infinite *board*, it c
 ## Installation (Linux)
 1. Download a *Python 3.14.5 (or higher)* installer from [here](https://www.python.org/downloads/), unless the former isn't already installed on your machine
 2. Execute the installer with privilege `sudo python -BO install.py`
+3. Uninstall the program with privilege `sudo python -BO install.py uninstall`
 
 
 ## Usage
