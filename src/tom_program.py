@@ -22,12 +22,18 @@ class TomProgram:
         while True:
             match state:
                 case TomState.BOARD:
+
                     # entering the BOARD state and waiting for termination to read transition
                     state = self.board.run(screen)
 
                 case TomState.SEARCH:
-                    # screenshot the board, blur and and darken it and use it as background
-                    bg = pg.transform.gaussian_blur(screen, 20)
+
+                    # fast gaussian blur (3-pass) of the board
+                    bg = pg.transform.box_blur(screen, 3)
+                    bg = pg.transform.box_blur(bg, 5)
+                    bg = pg.transform.box_blur(bg, 7)
+
+                    # layer solid color over blur
                     layer = pg.Surface(screen.get_size())
                     layer.fill(tc.BG_SEARCH)
                     layer.set_alpha(100)
