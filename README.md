@@ -45,24 +45,11 @@ The execution starts from `main.py` that applies `tom_serialization.py` to calcu
 * Image cropping
 * Lazy scaling (only scale what is in scope)
 * Image preview while searching
-
+* Transparency while dragging
 
 ## Issues
-* The cursor 'loses' the image if one drags to fast. The code looks like this
-  ```python
-  ...
-  # If the mouse moves and the left button is pressed
-  elif event.type == pg.MOUSEMOTION and event.buttons[0]:
-  ...
-  # If the mouse cursor is inside the image
-  if self.pt_in_box(cur_proj, self.srf_pos[i], self.srf_size_on[i]):
-      # Move the image by the mouse's relative displacement
-      self.srf_pos[i].x += cam.lenabs(event.rel[0])
-      self.srf_pos[i].y += cam.lenabs(event.rel[1])
-  ```
-  the *bug* originates from the fact that mouse cursor check is done before the displacement, a possible fix is for the cursor check to happen with respect to the final position of the image instead.
-* The gaussian blur implementation `pg.transform.gaussian_blur` is painfully slow.
-* Elements outside of the scope still get rescaled, the performance is terrible.
+* The gaussian blur implementation is approximated with three passes of `pg.transform.box_blur`, its better than `pg.transform.gaussian_blur` but it can be made better
+* Elements outside of the scope are cropped accordingly and don't get rescaled, this saves a lot of computation. However, now panning is very expansive if many images are contained whole in the viewport
 
 
 ## Methods
