@@ -106,7 +106,10 @@ class TomBoard:
                 if event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
                     self.ifoc = self.img_count
                     bg_color = tc.BG_TRAVEL
-                    self.scale_full(i)
+
+                    # render images outside the viewport scope
+                    for i in range(self.img_count):
+                        self.scale_full(i)
 
                 # focus an image by left click
                 elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
@@ -116,10 +119,12 @@ class TomBoard:
                     bg_color = tc.BG_TRAVEL
 
                     # check if cursor (projected into the image space) is contained inside any image
-                    for i in reversed(range(0, self.img_count)):
-                        cur_proj = tm.absto(tm.Vec2(*event.pos), self.cam_pos, self.cam_scale)
+                    for i in reversed(range(self.img_count)):
+
+                        # render images outside the viewport scope
                         self.scale_full(i)
 
+                        cur_proj = tm.absto(tm.Vec2(*event.pos), self.cam_pos, self.cam_scale)
                         if (
                             self.img_pos[i].x < cur_proj.x < self.img_pos[i].x + self.img_size_on[i].x and
                             self.img_pos[i].y < cur_proj.y < self.img_pos[i].y + self.img_size_on[i].y
