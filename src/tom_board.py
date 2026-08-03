@@ -64,14 +64,9 @@ class TomBoard:
 
         # edge-lenght description of image absolute-rectangle before scaling
         scale_total = self.cam_scale * self.img_scale[iimg]
-        pos_clip = (pos_nw_clip - pos_nw) / scale_total
-        size_clip = (pos_se_clip - pos_nw_clip) / scale_total
-        rect = (
-            min(pos_clip.x, self.img_size_off[iimg].x),
-            min(pos_clip.y, self.img_size_off[iimg].y),
-            max(size_clip.x, 0),
-            max(size_clip.y, 0)
-        )
+        pos_clip = tm.minmax(tm.Vec2(0, 0), (pos_nw_clip - pos_nw) / scale_total, self.img_size_off[iimg])
+        size_clip = tm.minmax(tm.Vec2(0, 0), (pos_se_clip - pos_nw_clip) / scale_total, self.img_size_off[iimg])
+        rect = (pos_clip.x, pos_clip.y, size_clip.x, size_clip.y)
 
         # image rectangle absolute edge after scaling
         self.img_crop_pos[iimg] = pos_clip * self.img_scale[iimg]
