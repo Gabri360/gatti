@@ -44,7 +44,6 @@ The execution starts from `main.py` that applies `tom_serialization.py` to calcu
 * Local and global rotation
 * Image cropping
 * Image preview while searching
-* Transparency while dragging
 
 ## Issues
 * The gaussian blur implementation is approximated with three passes of `pg.transform.box_blur`, its better than `pg.transform.gaussian_blur` but it could be made better.

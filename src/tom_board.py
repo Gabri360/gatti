@@ -138,9 +138,18 @@ class TomBoard:
                             self.img_size_off.append(self.img_size_off.pop(i))
                             self.img_scale.append(self.img_scale.pop(i))
 
+                            # set focused image index
                             self.ifoc = self.img_count - 1
                             bg_color = tc.BG_MOVE
+
+                            # lower image opacity
+                            self.img_srf_on[self.ifoc].set_alpha(100)
+                            
                             break
+
+                # higher image opacity of focused image when mouse button is being let go of
+                elif self.ifoc < self.img_count and event.type == pg.MOUSEBUTTONUP and event.button == 1:
+                    self.img_srf_on[self.ifoc].set_alpha(255)
 
                 # pan an image by the dragged distance if an image is focused and the cursor is dragging
                 elif self.ifoc < self.img_count and event.type == pg.MOUSEMOTION and event.buttons[0]:
@@ -184,20 +193,9 @@ class TomBoard:
             # draw background
             screen.fill(bg_color)
 
-            # draw unfocused images
-            for i in range(0, self.ifoc):
+            # draw images
+            for i in range(0, self.img_count):
                 pos_screen = tm.relto(self.img_pos[i] + self.img_crop_pos[i], self.cam_pos, self.cam_scale)
                 screen.blit(self.img_srf_on[i], astuple(pos_screen))
-
-            for i in range(self.ifoc + 1, self.img_count):
-                pos_screen = tm.relto(self.img_pos[i] + self.img_crop_pos[i], self.cam_pos, self.cam_scale)
-                screen.blit(self.img_srf_on[i], astuple(pos_screen))
-
-            # focused image is drawn with a lower opacity
-            if self.ifoc < self.img_count:
-                pos_screen = tm.relto(self.img_pos[self.ifoc] + self.img_crop_pos[self.ifoc], self.cam_pos, self.cam_scale)
-                self.img_srf_on[self.ifoc].set_alpha(100)
-                screen.blit(self.img_srf_on[self.ifoc], astuple(pos_screen))
-                self.img_srf_on[self.ifoc].set_alpha(255)
         
             pg.display.update()
