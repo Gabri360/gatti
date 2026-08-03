@@ -43,16 +43,24 @@ The execution starts from `main.py` that applies `tom_serialization.py` to calcu
 * Physical panning and zooming (momentum, viscousity and elasticity)
 * Local and global rotation
 * Image cropping
-* Lazy scaling (only scale what is in scope)
 * Image preview while searching
 * Transparency while dragging
 
 ## Issues
-* The gaussian blur implementation is approximated with three passes of `pg.transform.box_blur`, its better than `pg.transform.gaussian_blur` but it can be made better
-* Elements outside of the scope are cropped accordingly and don't get rescaled, this saves a lot of computation. However, now panning is very expansive if many images are contained whole in the viewport
+* The gaussian blur implementation is approximated with three passes of `pg.transform.box_blur`, its better than `pg.transform.gaussian_blur` but it could be made better.
 
 
 ## Methods
+
+### Lazy scaling
+Because most of the time images are scaled outside the scope of the viewport and scaling (smooth-scaling especially) is a costly operation, the idea behind *lazy scaling* is that of cropping out image information outside the viewport's scope before scaling. Without *lazy scaling* zooming very far in creates to much latency. The cost of *lazy scaling* is that *panning* can't be done anymore indipendently of *lazy scaling* a strategy is to make a single pass of *full scaling* before.
+```
+image.rect_screen = relative_to(image.rect_world, camera)
+image.rect.nw = minmax((0, 0), image.rect_screen.nw, (screen.width, screen.height))
+image.rect.se = minmax((0, 0), image.rect_screen.se, (screen.width, screen.height))
+image.rect_world = absolute_to(image.rect_screen, camera)
+scale(crop(image))
+```
 
 ### Fixed point scaling
 Given a change in camera `z`, which `X` should the camera be placed at such that a point `x` remains unchanged (primed variables indicate the transformed counterpart)?

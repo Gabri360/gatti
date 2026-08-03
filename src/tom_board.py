@@ -52,7 +52,12 @@ class TomBoard:
         self.img_scale.append(scale)
         self.img_count += 1
 
-    def refit(self, iimg, screen):
+    def scale_full(self, iimg):
+        scale_total = self.cam_scale * self.img_scale[iimg]
+        self.img_srf_on[iimg] = pg.transform.smoothscale_by(self.img_srf_off[iimg], scale_total)
+        self.img_crop_pos[iimg] = tm.Vec2(0, 0)
+
+    def scale_lazy(self, iimg, screen):
 
         # edge-edge description of image screen-rectangle (north-west and south-east)
         pos_nw = tm.relto(self.img_pos[iimg], self.cam_pos, self.cam_scale)
@@ -86,9 +91,6 @@ class TomBoard:
                 if event.type == pg.MOUSEMOTION and ((event.buttons[0] and self.ifoc == self.img_count) or event.buttons[2]):
                     self.cam_pos -= tm.Vec2(*event.rel) / self.cam_scale
 
-                    for i in range(self.img_count):
-                        self.refit(i, screen)
-
                 # globally scale the environment if no image is focused
                 elif event.type == pg.MOUSEWHEEL and self.ifoc == self.img_count:
 
@@ -98,12 +100,13 @@ class TomBoard:
                     self.cam_scale /= dz
 
                     for i in range(self.img_count):
-                        self.refit(i, screen)
+                        self.scale_lazy(i, screen)
 
                 # unfocus an image by right click
                 if event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
                     self.ifoc = self.img_count
                     bg_color = tc.BG_TRAVEL
+                    self.scale_full(i)
 
                 # focus an image by left click
                 elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
@@ -115,9 +118,12 @@ class TomBoard:
                     # check if cursor (projected into the image space) is contained inside any image
                     for i in reversed(range(0, self.img_count)):
                         cur_proj = tm.absto(tm.Vec2(*event.pos), self.cam_pos, self.cam_scale)
-                        if (self.img_pos[i].x < cur_proj.x < self.img_pos[i].x + self.img_size_on[i].x and
-                            self.img_pos[i].y < cur_proj.y < self.img_pos[i].y + self.img_size_on[i].y):
+                        self.scale_full(i)
 
+                        if (
+                            self.img_pos[i].x < cur_proj.x < self.img_pos[i].x + self.img_size_on[i].x and
+                            self.img_pos[i].y < cur_proj.y < self.img_pos[i].y + self.img_size_on[i].y
+                        ):
                             # push focused image to the top layer
                             self.img_pos.append(self.img_pos.pop(i))
                             self.img_path.append(self.img_path.pop(i))
@@ -134,7 +140,6 @@ class TomBoard:
                 # pan an image by the dragged distance if an image is focused and the cursor is dragging
                 elif self.ifoc < self.img_count and event.type == pg.MOUSEMOTION and event.buttons[0]:
                     self.img_pos[self.ifoc] += tm.Vec2(*event.rel) / self.cam_scale
-                    self.refit(self.ifoc, screen)
 
                 # scale the image if an image is foucsed and the mouse-wheel is rolling
                 elif self.ifoc < self.img_count and event.type == pg.MOUSEWHEEL:
@@ -147,7 +152,7 @@ class TomBoard:
                     self.img_size_on[self.ifoc] = self.img_size_off[self.ifoc] * self.img_scale[self.ifoc]
 
                     # update the scales locally
-                    self.refit(self.ifoc, screen)
+                    self.scale_lazy(self.ifoc, screen)
 
                 # delete the image if an image is focused and the X key is pressed
                 elif self.ifoc < self.img_count and event.type == pg.KEYDOWN and event.key == pg.K_x:
