@@ -37,7 +37,7 @@ elif os.name == "nt":
         
         # Install 'executable'
         with open(os.path.join(common, "tom.bat"), "w") as file:
-            file.write(' '.join(["call", os.path.join(common, "venv", "Scripts", "python"), os.path.join(common, "tom.bat"), "%*"]))
+            file.write(' '.join(["call", os.path.join(common, "venv", "Scripts", "python"), os.path.join(common, "src", "main.py"), "%*"]))
 
             target = os.path.join(common, "tom.bat")
             shortcut = os.path.join(os.environ["USERPROFILE"], "Desktop", "tom.lnk")
