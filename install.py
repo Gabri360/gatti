@@ -1,5 +1,6 @@
 import json
 from sys import argv
+import os
 from os.path import expanduser as homedir
 from os import name as os_name
 from os import listdir as ls
@@ -18,34 +19,32 @@ elif os_name == "nt":
 
     if len(argv) == 1:
         # Install virtual environment
-        call(["md", r"\Program Files\tom"])
-        call(["python", "-m", "venv", r"\Program Files\tom"])
-        call([r"\Program Files\tom\venv\Scripts\python", "-m", "pip", "install", "pygame-ce", "--quiet", "--quiet"])
+        call(["md", r"%ProgramFiles%\tom"])
+        call(["python", "-m", "venv", r"%ProgramFiles%\tom"])
+        call([r"%ProgramFiles%\tom\venv\Scripts\python", "-m", "pip", "install", "pygame-ce", "--quiet", "--quiet"])
         
         # Install assets
-        call(["xcopy", "themes", r"\Program Files\tom\themes"])
+        call(["xcopy", "themes", r"%ProgramFiles%\tom\themes"])
         
         # Install source
-        call(["xcopy", "src", r"\Program Files\tom\src"])
-        with open("/usr/local/src/tom/path", "w") as file:
-            file.write("/usr/local/etc/tom")
+        call(["xcopy", "src", r"%ProgramFiles%\tom\src"])
         
         # Install config
-        with open(r"\Program Files\tom\settings.json", "w") as file:
+        with open(r"%ProgramFiles%\tom\settings.json", "w") as file:
             json.dump({
                 "width": 1280,
                 "height": 720,
-                "theme": r"\Program Files\tom\themes\default.json"
+                "theme": r"%ProgramFiles%\tom\themes\default.json"
             }, file, indent=4)
         
         # Install 'executable'
-        with open("/usr/local/bin/tom", "w") as file:
+        with open(r"%ProgramFiles%\tom\tom.bat", "w") as file:
             file.write("@echo off\n")
-            file.write(r"cmd /k \"cd /d C:\Program Files\tom\venv\Scripts & .\activate & cd /d C:\Program Files\tom & python -BO src\main.py\"")
-            call(["powershell", r"\"$s=(New-Object -COM WScript.Shell).CreateShortcut('C:\Users\USERNAME\Desktop\tom.lnk');$s.TargetPath='C:\Program Files\tom\tom.bat';$s.Save()\""])
+            file.write(r"cmd /k \"cd /d %ProgramFiles%\tom\venv\Scripts & .\activate & cd /d %ProgramFiles%\tom & python -BO src\main.py\"")
+            call(["powershell", r"\"$s=(New-Object -COM WScript.Shell).CreateShortcut('%USERPROFILE%\Desktop\tom.lnk');$s.TargetPath='%ProgramFiles%\tom\tom.bat';$s.Save()\""])
     
     elif len(argv) == 2 and argv[1] == "uninstall":
-        call(["rd", "/s", "/q", r"\Program Files\tom"])
+        call(["rmdir", "/s", "/q", r"%ProgramFiles%\tom"])
 
 elif os_name == "posix":
     if len(argv) == 1:
