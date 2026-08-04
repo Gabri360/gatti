@@ -20,7 +20,7 @@ if len(argv) == 1:
     # Install virtual environment
     call(["mkdir", "/usr/local/lib/tom"])
     call(["python", "-m", "venv", "/usr/local/lib/tom/venv"])
-    call(["/usr/local/lib/tom/venv/bin/python", "-m", "pip", "install", "pygame-ce"])
+    call(["/usr/local/lib/tom/venv/bin/python", "-m", "pip", "install", "pygame-ce", "--quiet", "--quiet"])
     
     # Install assets
     call(["mkdir", "/usr/local/share/tom"])
