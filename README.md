@@ -6,11 +6,17 @@ A simple **image viewer** that focuses on cumulative browsing.
 Images are queried from a *search bar* and loaded onto an infinite *board*, it can accomodates and infinite amount of images at different scales without compromises on quality.
 
 
-## Installation (Linux)
+## Installation
 1. Download a *Python 3.14.5 (or higher)* installer from [here](https://www.python.org/downloads/), unless the former isn't already installed on your machine
+
+### Linux
 2. Execute the installer with privilege `sudo python -BO install.py`
 3. Uninstall the program with privilege `sudo python -BO install.py uninstall`
 
+### Windows
+2. Open `Command Prompt` with elevated privilege (right click on application and left click *run as administrator*)
+3. Move to the directory with `cd %USERPROFILE%\Desktop\tom-main`
+4. Run the installer with `python -BO install.py`
 
 ## Usage
 1. Run the program with `tom [SAVE].tom` (replace `[SAVE]` with a name of your choice)
