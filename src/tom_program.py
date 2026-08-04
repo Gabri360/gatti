@@ -46,18 +46,14 @@ class TomProgram:
                     if state == TomState.BOARD:
 
                         # load the searched image
-                        path = '/'.join(self.search.walk)
-                        srf = pg.image.load(path).convert_alpha()
+                        srf = pg.image.load(self.search.result).convert_alpha()
 
                         # add image to center of the board with half-screen-width scale
                         scale_rel = 0.5 * screen.get_width() / srf.get_width()
                         scale_abs = scale_rel / self.board.cam_scale
                         pos_rel = (tm.Vec2(*screen.get_size()) - tm.Vec2(*srf.get_size())  * scale_rel) / 2
                         pos_abs = tm.absto(pos_rel, self.board.cam_pos, self.board.cam_scale)
-                        self.board.add(path, srf, pos_abs, scale_abs)
-
-                        # prepare next query
-                        self.search.walk.pop()
+                        self.board.add(self.search.result, srf, pos_abs, scale_abs)
 
                 case TomState.EXIT:
                     # exit the program

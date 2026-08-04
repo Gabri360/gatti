@@ -1,8 +1,10 @@
+import os
 import json
 
-cwd = '/'.join(__file__.split('/')[:-1])
-with open(f"{cwd}/path", "r") as file:
-    path = '/'.join([line for line in file] + ["settings.json"])
+
+cwd, thisfile = os.path.split(__file__)
+with open(os.path.join(cwd, "path"), "r") as file:
+    path = os.path.join(*(line for line in file), "settings.json")
 
 with open(path, "r") as file:
     settings = json.load(file)

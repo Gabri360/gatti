@@ -10,27 +10,28 @@ import tom_state as ts
 @dataclass(slots=True)
 class TomSearch:
     part: str
-    walk: list[str]
+    walk: str
     hint: list[str]
     index: int
 
     @classmethod
     def empty(cls):
-        return cls(part="", walk=os.path.abspath("").split('/'), hint=[], index=0)
+        return cls(part="", walk=os.path.abspath(""), hint=[], index=0)
+
+    @property
+    def result(self):
+        return os.path.join(self.walk, self.part)
 
     def genhint(self):
 
         LEGAL = [".jpg", ".jpeg", ".png", ".webp"]
 
-        # absolute path is used because it hints at possible sub-directories
-        path = '/'.join(self.walk)
-
         # only some specific names are worth exploring
         self.hint = sorted((
-            name for name in os.listdir(path)
+            name for name in os.listdir(self.walk)
 
             # filter unrecognized formats (that aren't directories)
-            if (any(fmt in name for fmt in LEGAL) or os.path.isdir(f"{path}/{name}"))
+            if (any(fmt in name for fmt in LEGAL) or os.path.isdir(os.path.join(self.walk, name)))
 
         ), key=lambda t: pselev(self.part, t))
 
@@ -50,7 +51,7 @@ class TomSearch:
                     if len(self.part) > 0:
                         self.part = self.part[:-1]
                     else:
-                        self.walk.pop()
+                        self.walk, _ = os.path.split(self.walk)
                         
                 # roll through hints
                 elif event.key == pg.K_TAB:
@@ -64,13 +65,13 @@ class TomSearch:
                         continue
 
                     # fit user-input to nearest hint and extend walk
-                    self.walk.append(self.hint[self.index])
-                    self.part = ""
+                    self.part = self.hint[self.index]
 
                     # transition to the BOARD if the walk can no longer be extended otherwise generate new hints
-                    path = '/'.join(self.walk)
-                    if not os.path.isdir(path):
+                    if not os.path.isdir(os.path.join(self.walk, self.part)):
                         return ts.TomState.BOARD
+                    else:
+                        self.walk = os.path.join(self.walk, self.part)
 
                 # exit program if the ESC key is pressed
                 elif event.key == pg.K_ESCAPE:
@@ -87,7 +88,7 @@ class TomSearch:
             screen.blit(bg, (0, 0))
 
             # draw search box (active buffer)
-            text = '/'.join(self.walk + [self.part])
+            text = os.path.join(self.walk, self.part)
             pos_box = pos - tm.Vec2(*font.size(text)) / 2
             srf = font.render(text, antialias=True, color=tc.TEXT)
             screen.blit(srf, astuple(pos_box))
@@ -97,7 +98,7 @@ class TomSearch:
             for i, p in enumerate(self.hint[self.index:] + self.hint[:self.index]):
 
                 # fade out rendered text
-                text = '/'.join(self.walk + [p])
+                text = os.path.join(self.walk, p)
                 srf = font.render(text, antialias=True, color=tc.TEXT)
                 srf.set_alpha(fade)
 
