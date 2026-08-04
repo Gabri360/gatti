@@ -19,13 +19,16 @@ elif os.name == "nt":
         call([os.path.join(common, "venv", "Scripts", "python"), "-m", "pip", "install", "pygame-ce", "--quiet", "--quiet"])
         
         # Install assets
-        call(["xcopy", "themes", os.path.join(common, "themes")])
+        call(["xcopy", "/i", "themes", os.path.join(common, "themes")])
         
         # Install source
-        call(["xcopy", "src", os.path.join(common, "src")])
+        call(["xcopy", "/i", "src", os.path.join(common, "src")])
+        with open(os.path.join(common, "src", "path"), "w") as file:
+            file.write(os.path.join(common, "conf"))
         
         # Install config
-        with open(os.path.join(common, "settings.json"), "w") as file:
+        os.mkdir(os.path.join(common, "conf"))
+        with open(os.path.join(common, "conf", "settings.json"), "w") as file:
             json.dump({
                 "width": 1280,
                 "height": 720,
@@ -35,8 +38,16 @@ elif os.name == "nt":
         # Install 'executable'
         with open(os.path.join(common, "tom.bat"), "w") as file:
             file.write("@echo off\n")
-            file.write(r"cmd /k \"cd /d %ProgramFiles%\tom\venv\Scripts & .\activate & cd /d %ProgramFiles%\tom & python -BO src\main.py\"")
-            call(["powershell", r"$s=(New-Object -COM WScript.Shell).CreateShortcut('%USERPROFILE%\Desktop\tom.lnk');$s.TargetPath='%ProgramFiles%\tom\tom.bat';$s.Save()"])
+            file.write(' '.join("cmd", "/k", '"' + '&'.join(
+                ' '.join("cd", "/d", os.path.join(common, "venv", "Scripts")),
+                ' '.join(os.path.join(".", "activate")),
+                ' '.join("cd", "/d", os.path.join(common)),
+                ' '.join("python", "-BO", os.path.join("src", "main.py"))
+            ) + '"'))
+
+            target = os.path.join(common, "tom.bat")
+            shortcut = os.path.join(os.environ["USERPROFILE"], "Desktop", "tom.lnk")
+            call(["powershell", f"$s=(New-Object -COM WScript.Shell).CreateShortcut('{shortcut}');$s.TargetPath='{target}';$s.Save()"])
     
 elif os.name == "posix":
     common = "/usr/local"
