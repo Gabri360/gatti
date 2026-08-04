@@ -30,3 +30,6 @@ def minmax(l: Vec2, m: Vec2, u: Vec2):
         x=min(max(l.x, m.x), u.x),
         y=min(max(l.y, m.y), u.y)
     )
+
+def in_box(nw: Vec2, p: Vec2, se: Vec2):
+    return nw.x < p.x < se.x and nw.y < p.y < se.y

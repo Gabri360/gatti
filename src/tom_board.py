@@ -52,11 +52,6 @@ class TomBoard:
         self.img_scale.append(scale)
         self.img_count += 1
 
-    def scale_full(self, iimg):
-        scale_total = self.cam_scale * self.img_scale[iimg]
-        self.img_srf_on[iimg] = pg.transform.smoothscale_by(self.img_srf_off[iimg], scale_total)
-        self.img_crop_pos[iimg] = tm.Vec2(0, 0)
-
     def scale_lazy(self, iimg, screen):
 
         # edge-edge description of image screen-rectangle (north-west and south-east)
@@ -90,6 +85,14 @@ class TomBoard:
                 # globally pan the environment if no image is left clicked or by arbitrary right click
                 if event.type == pg.MOUSEMOTION and ((event.buttons[0] and self.ifoc == self.img_count) or event.buttons[2]):
                     self.cam_pos -= tm.Vec2(*event.rel) / self.cam_scale
+                    for i in range(self.img_count):
+                        nw = tm.absto(tm.Vec2(0, 0), self.cam_pos, self.cam_scale)
+                        se = tm.absto(tm.Vec2(*screen.get_size()), self.cam_pos, self.cam_scale)
+                        if not (
+                                tm.in_box(nw, self.img_pos[i], se) and
+                                tm.in_box(nw, self.img_pos[i] + self.img_size_on[i], se)
+                        ):
+                            self.scale_lazy(i, screen)
 
                 # globally scale the environment if no image is focused
                 elif event.type == pg.MOUSEWHEEL and self.ifoc == self.img_count:
@@ -107,10 +110,6 @@ class TomBoard:
                     self.ifoc = self.img_count
                     bg_color = tc.BG_TRAVEL
 
-                    # render images outside the viewport scope
-                    for i in range(self.img_count):
-                        self.scale_full(i)
-
                 # focus an image by left click
                 elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
 
@@ -121,17 +120,12 @@ class TomBoard:
                     # check if cursor (projected into the image space) is contained inside any image
                     for i in reversed(range(self.img_count)):
 
-                        # render images outside the viewport scope
-                        self.scale_full(i)
-
                         cur_proj = tm.absto(tm.Vec2(*event.pos), self.cam_pos, self.cam_scale)
-                        if (
-                            self.img_pos[i].x < cur_proj.x < self.img_pos[i].x + self.img_size_on[i].x and
-                            self.img_pos[i].y < cur_proj.y < self.img_pos[i].y + self.img_size_on[i].y
-                        ):
+                        if tm.in_box(self.img_pos[i], cur_proj, self.img_pos[i] + self.img_size_on[i]):
                             # push focused image to the top layer
                             self.img_pos.append(self.img_pos.pop(i))
                             self.img_path.append(self.img_path.pop(i))
+                            self.img_crop_pos.append(self.img_crop_pos.pop(i))
                             self.img_srf_on.append(self.img_srf_on.pop(i))
                             self.img_srf_off.append(self.img_srf_off.pop(i))
                             self.img_size_on.append(self.img_size_on.pop(i))
@@ -143,17 +137,26 @@ class TomBoard:
                             bg_color = tc.BG_MOVE
 
                             # lower image opacity
+                            self.img_srf_off[self.ifoc].set_alpha(100)
                             self.img_srf_on[self.ifoc].set_alpha(100)
                             
                             break
 
                 # higher image opacity of focused image when mouse button is being let go of
                 elif self.ifoc < self.img_count and event.type == pg.MOUSEBUTTONUP and event.button == 1:
+                    self.img_srf_off[self.ifoc].set_alpha(255)
                     self.img_srf_on[self.ifoc].set_alpha(255)
 
                 # pan an image by the dragged distance if an image is focused and the cursor is dragging
                 elif self.ifoc < self.img_count and event.type == pg.MOUSEMOTION and event.buttons[0]:
                     self.img_pos[self.ifoc] += tm.Vec2(*event.rel) / self.cam_scale
+                    nw = tm.absto(tm.Vec2(0, 0), self.cam_pos, self.cam_scale)
+                    se = tm.absto(tm.Vec2(*screen.get_size()), self.cam_pos, self.cam_scale)
+                    if not (
+                            tm.in_box(nw, self.img_pos[self.ifoc], se) and
+                            tm.in_box(nw, self.img_pos[self.ifoc] + self.img_size_on[self.ifoc], se)
+                    ):
+                        self.scale_lazy(self.ifoc, screen)
 
                 # scale the image if an image is foucsed and the mouse-wheel is rolling
                 elif self.ifoc < self.img_count and event.type == pg.MOUSEWHEEL:
