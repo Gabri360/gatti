@@ -72,6 +72,7 @@ class TomSearch:
                         return ts.TomState.BOARD
                     else:
                         self.walk = os.path.join(self.walk, self.part)
+                        self.part = ""
 
                 # exit program if the ESC key is pressed
                 elif event.key == pg.K_ESCAPE:
