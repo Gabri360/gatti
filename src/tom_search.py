@@ -26,16 +26,13 @@ class TomSearch:
         path = '/'.join(self.walk)
 
         # only some specific names are worth exploring
-        self.hint = sorted(
+        self.hint = sorted((
             name for name in os.listdir(path)
 
-            # filter names that are incompatible with the query
-            if self.part in name[:len(self.part)] and
-
             # filter unrecognized formats (that aren't directories)
-            (any(fmt in name for fmt in LEGAL) or os.path.isdir(f"{path}/{name}"))
+            if (any(fmt in name for fmt in LEGAL) or os.path.isdir(f"{path}/{name}"))
 
-        )
+        ), key=lambda t: pselev(self.part, t))
 
     def run(self, screen, font, bg, pos):
 
@@ -82,6 +79,7 @@ class TomSearch:
                 # append user-input if the pressed key ALPHA-NUMERICAL
                 else:
                     self.part += event.unicode
+                    self.index = 0
 
                 self.genhint()
 
@@ -111,3 +109,29 @@ class TomSearch:
                 fade /= 2
         
             pg.display.update()
+
+
+# https://en.wikipedia.org/wiki/Levenshtein_distance
+def pselev(s, t):
+
+    v0 = [i for i in range(0, len(t) + 1)]
+    v1 = [0 for i in range(0, len(t) + 1)]
+
+    for i in range(len(s)):
+        v1[0] = i + 1
+        for j in range(len(t)):
+            deletionCost = v0[j+1] + 1
+
+            # the original levenshtein has an insertion cost of 1 instead of 0
+            insertionCost = v1[j] + 0
+
+            if s[i] == t[j]:
+                substitutionCost = v0[j]
+            else:
+                substitutionCost = v0[j] + 1
+
+            v1[j+1] = min(deletionCost, insertionCost, substitutionCost)
+
+        v0, v1 = v1, v0
+
+    return v0[len(t)]

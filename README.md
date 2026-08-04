@@ -37,7 +37,6 @@ The execution starts from `main.py` that applies `tom_serialization.py` to calcu
 
 
 ## Upcoming features
-* Improve the search box
 * Image comments
 * World grid
 * Physical panning and zooming (momentum, viscousity and elasticity)
@@ -50,6 +49,9 @@ The execution starts from `main.py` that applies `tom_serialization.py` to calcu
 
 
 ## Methods
+
+### Levenshtein distance
+A method used to compare the similarity between two strings. This is used in the search algorithm to show the best hints possible.
 
 ### Lazy scaling
 Because most of the time images are scaled outside the scope of the viewport and scaling (smooth-scaling especially) is a costly operation, the idea behind *lazy scaling* is that of cropping out image information outside the viewport's scope before scaling. Without *lazy scaling* zooming very far in creates to much latency. The cost of *lazy scaling* is that *panning* can't be done anymore indipendently of *lazy scaling* a strategy is to make a single pass of *full scaling* before.
