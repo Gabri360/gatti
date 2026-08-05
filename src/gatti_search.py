@@ -2,13 +2,13 @@ import os
 import pygame as pg
 from dataclasses import dataclass, astuple
 
-import tom_math as tm
-import tom_colors as tc
-import tom_state as ts
+import gatti_math as gm
+import gatti_colors as gc
+import gatti_state as gs
 
 
 @dataclass(slots=True)
-class TomSearch:
+class GattiSearch:
     part: str
     walk: str
     hint: list[str]
@@ -69,14 +69,14 @@ class TomSearch:
 
                     # transition to the BOARD if the walk can no longer be extended otherwise generate new hints
                     if not os.path.isdir(os.path.join(self.walk, self.part)):
-                        return ts.TomState.BOARD
+                        return gs.GattiState.BOARD
                     else:
                         self.walk = os.path.join(self.walk, self.part)
                         self.part = ""
 
                 # exit program if the ESC key is pressed
                 elif event.key == pg.K_ESCAPE:
-                    return ts.TomState.EXIT
+                    return gs.GattiState.EXIT
 
                 # append user-input if the pressed key ALPHA-NUMERICAL
                 else:
@@ -90,8 +90,8 @@ class TomSearch:
 
             # draw search box (active buffer)
             text = os.path.join(self.walk, self.part)
-            pos_box = pos - tm.Vec2(*font.size(text)) / 2
-            srf = font.render(text, antialias=True, color=tc.TEXT)
+            pos_box = pos - gm.Vec2(*font.size(text)) / 2
+            srf = font.render(text, antialias=True, color=gc.TEXT)
             screen.blit(srf, astuple(pos_box))
             
             # draw search box (completion hints)
@@ -100,12 +100,12 @@ class TomSearch:
 
                 # fade out rendered text
                 text = os.path.join(self.walk, p)
-                srf = font.render(text, antialias=True, color=tc.TEXT)
+                srf = font.render(text, antialias=True, color=gc.TEXT)
                 srf.set_alpha(fade)
 
                 # blit text in a cascading fashion under the active buffer
-                pos_box = pos - tm.Vec2(*font.size(text)) / 2
-                pos_offset = tm.Vec2(0, font.get_height() * (i+1))
+                pos_box = pos - gm.Vec2(*font.size(text)) / 2
+                pos_offset = gm.Vec2(0, font.get_height() * (i+1))
                 screen.blit(srf, astuple(pos_box + pos_offset))
 
                 fade /= 2

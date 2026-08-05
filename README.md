@@ -15,11 +15,11 @@ Images are queried from a *search bar* and loaded onto an infinite *board*, it c
 
 ### Windows
 2. Open `Command Prompt` with elevated privilege (right click on application and left click *run as administrator*)
-3. Move to the directory with `cd %USERPROFILE%\Desktop\tom-main`
+3. Move to the directory with `cd %USERPROFILE%\Desktop\gatti-main`
 4. Run the installer with `python -BO install.py`
 
 ## Usage
-1. Run the program with `tom [SAVE].tom` (replace `[SAVE]` with a name of your choice)
+1. Run the program with `gatti [SAVE].gatti` (replace `[SAVE]` with a name of your choice)
 2. Press `s` on your keyboard to open the *search bar*
 3. Write a path to a valid image file and press `RETURN` on the keyboard to load it onto the *board*
 4. Left click an image and drag the mouse, the image will drag as well
@@ -36,10 +36,11 @@ Images are queried from a *search bar* and loaded onto an infinite *board*, it c
 ## Trivia
 1. This program originated from an idea of mine at the end of July of 2026, I had many exams to take but the excuse to spend time making this was that it was *essential* for organizing my notes.
 2. The name *tom* came to mind while thinking of the song title "tower of memories" by ivri.
+3. The name *gatti* means *cats* in italian, its an acronym for **g**allery **a**rranger **t**hat **t**akes **i**mages. This will also make more sense later...
 
 
 # Development
-The execution starts from `main.py` that applies `tom_serialization.py` to calculate the initial state of `tom_program.py`, a state machine that handles transitions between an *image board* implemented in `tom_board.py` and a *search query* implemented in `tom_search.py`.
+The execution starts from `main.py` that applies `gatti_serialization.py` to calculate the initial state of `gatti_program.py`, a state machine that handles transitions between an *image board* implemented in `gatti_board.py` and a *search query* implemented in `gatti_search.py`.
 
 
 ## Upcoming features

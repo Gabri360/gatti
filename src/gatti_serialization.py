@@ -1,11 +1,11 @@
 import pygame as pg
-import tom_math as tm
+import gatti_math as gm
 
 
 def load_program(prog, data_cam, data_img):
 
     # loading camera data
-    prog.board.cam_pos = tm.Vec2(data_cam["position"]["x"], data_cam["position"]["y"])
+    prog.board.cam_pos = gm.Vec2(data_cam["position"]["x"], data_cam["position"]["y"])
     prog.board.cam_scale = data_cam["scale"]
 
     # loading image data
@@ -13,7 +13,7 @@ def load_program(prog, data_cam, data_img):
         prog.board.add(
             path=img["path"],
             srf=pg.image.load(img["path"]).convert_alpha(),
-            pos=tm.Vec2(img["position"]["x"], img["position"]["y"]),
+            pos=gm.Vec2(img["position"]["x"], img["position"]["y"]),
             scale=img["scale"]
         )
 

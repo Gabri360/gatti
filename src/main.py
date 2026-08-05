@@ -5,10 +5,10 @@ import pygame as pg
 from io import BytesIO
 from sys import argv
 
-import tom_params as tp
-from tom_program import TomProgram
-from tom_serialization import load_program
-from tom_serialization import dump_program
+import gatti_params as tp
+from gatti_program import GattiProgram
+from gatti_serialization import load_program
+from gatti_serialization import dump_program
 
 
 # protect script from getting imported
@@ -19,11 +19,11 @@ if __name__ != "__main__":
 
 # initialize graphics library and windowing
 pg.init()
-pg.display.set_caption("tom")
+pg.display.set_caption("gatti")
 screen = pg.display.set_mode((tp.WIDTH, tp.HEIGHT))
 
 # initialize blank program
-prog = TomProgram.empty()
+prog = GattiProgram.empty()
 
 
 try:

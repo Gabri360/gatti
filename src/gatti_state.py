@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
 
-class TomState(Enum):
+class GattiState(Enum):
     BOARD = auto()
     SEARCH = auto()
     EXIT = auto()

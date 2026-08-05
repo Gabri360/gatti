@@ -1,8 +1,8 @@
 import json
-import tom_params as tp
+import gatti_params as gp
 
 
-with open(tp.THEME, "r") as file:
+with open(gp.THEME, "r") as file:
     palette = json.load(file)
     BG_TRAVEL = palette["background-travel"]
     BG_MOVE = palette["background-move"]
