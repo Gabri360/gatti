@@ -36,7 +36,7 @@ Images are queried from a *search bar* and loaded onto an infinite *board*, it c
 ## Trivia
 1. This program originated from an idea of mine at the end of July of 2026, I had many exams to take but the excuse to spend time making this was that it was *essential* for organizing my notes.
 2. The name *tom* came to mind while thinking of the song title "tower of memories" by ivri.
-3. The name *gatti* means *cats* in italian, its an acronym for **g**allery **a**rranger **t**hat **t**akes **i**mages or maybe **g**allery **a**arranger **t**ooled **t**towards **i**mages. This will also make more sense later...
+3. The name *gatti* means *cats* in italian, its an acronym for **g**allery **a**rranger **t**hat **t**akes **i**mages or maybe **g**allery **a**rranger **t**ooled **t**owards **i**mages. This will also make more sense later...
 
 
 # Development
