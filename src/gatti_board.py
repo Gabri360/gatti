@@ -212,7 +212,7 @@ class GattiBoard:
                 pg.draw.line(screen, gc.GRID_COLOR, (col.x, 0), (col.x, tp.HEIGHT))
 
             for j in range(n_row + 2):
-                row = gm.relto(gm.Vec2(0,start_row + j * tp.GRID_SPACING), self.cam_pos, self.cam_scale)
+                row = gm.relto(gm.Vec2(0,start_row + j * gp.GRID_SPACING), self.cam_pos, self.cam_scale)
                 pg.draw.line(screen, gc.GRID_COLOR, (0, row.y), (gp.WIDTH, row.y))
 
 
