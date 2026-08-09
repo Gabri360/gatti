@@ -29,7 +29,12 @@ class GattiProgram:
                     size_screen = gm.Vec2(*screen.get_size())
                     size_splash = size_screen * 0.67
                     pos_splash = (size_screen - size_splash) / 2
-                    self.state = self.splash.run(screen, pg.font.SysFont("Calibri", 24), pos_splash, size_splash)
+
+                    # placeholder for background
+                    bg = pg.Surface(screen.get_size())
+                    bg.fill(gc.BG_SPLASH)
+
+                    self.state = self.splash.run(screen, pg.font.SysFont("Calibri", 44), pg.font.SysFont("Calibri", 24), pg.font.SysFont("Calibri", 16), bg, pos_splash, size_splash)
 
                 case GattiState.SEARCH:
                     # fast gaussian blur (3-pass) of the board
