@@ -1,7 +1,7 @@
 import pygame as pg
 from dataclasses import dataclass, astuple
 
-import gatti_params as tp
+import gatti_params as gp
 import gatti_colors as gc
 import gatti_state as gs
 import gatti_math as gm
