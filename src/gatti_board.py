@@ -205,7 +205,7 @@ class GattiBoard:
             start_row = self.cam_pos.y - (self.cam_pos.y % tp.GRID_SPACING)
 
             n_col = int(tp.WIDTH / tp.GRID_SPACING / self.cam_scale)
-            n_row = int(tp.HEIGHT / tp.GRID_SPACING / self.cam_scale)
+            n_row = int(gp.HEIGHT / gp.GRID_SPACING / self.cam_scale)
 
             for i in range(n_col + 2):
                 col = gm.relto(gm.Vec2(start_col + i * gp.GRID_SPACING, 0), self.cam_pos, self.cam_scale)
