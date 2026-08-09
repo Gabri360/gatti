@@ -3,11 +3,13 @@
     "credits": [
         {
             "name": "Alessandro Rayan Ahmed (@green)",
-            "role": "development"
+            "role": "development",
+            "comment": "Founder and lead developer of gatti"
         },
         {
             "name": "Gabriele Baldi (@Gabri360)",
-            "role": "development"
+            "role": "development",
+            "comment": "Implemented the first grid graphics and was significantly envolved with testing the project and giving feedback"
         }
     ]
 }

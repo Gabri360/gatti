@@ -5,7 +5,7 @@ import pygame as pg
 from io import BytesIO
 from sys import argv
 
-import gatti_params as tp
+import gatti_params as gp
 from gatti_program import GattiProgram
 from gatti_serialization import load_program
 from gatti_serialization import dump_program
@@ -20,7 +20,7 @@ if __name__ != "__main__":
 # initialize graphics library and windowing
 pg.init()
 pg.display.set_caption("gatti")
-screen = pg.display.set_mode((tp.WIDTH, tp.HEIGHT), pg.RESIZABLE)
+screen = pg.display.set_mode((gp.WIDTH, gp.HEIGHT), pg.RESIZABLE)
 
 # initialize blank program
 prog = GattiProgram.empty()
