@@ -204,7 +204,7 @@ class GattiBoard:
             start_col = self.cam_pos.x - (self.cam_pos.x % tp.GRID_SPACING)
             start_row = self.cam_pos.y - (self.cam_pos.y % tp.GRID_SPACING)
 
-            n_col = int(tp.WIDTH / tp.GRID_SPACING / self.cam_scale)
+            n_col = int(gp.WIDTH / gp.GRID_SPACING / self.cam_scale)
             n_row = int(gp.HEIGHT / gp.GRID_SPACING / self.cam_scale)
 
             for i in range(n_col + 2):
