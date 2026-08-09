@@ -1,6 +1,7 @@
 import pygame as pg
 from dataclasses import dataclass, astuple
 
+import gatti_params as tp
 import gatti_colors as gc
 import gatti_state as gs
 import gatti_math as gm
@@ -139,7 +140,7 @@ class GattiBoard:
                             # lower image opacity
                             self.img_srf_off[self.ifoc].set_alpha(100)
                             self.img_srf_on[self.ifoc].set_alpha(100)
-                            
+
                             break
 
                 # higher image opacity of focused image when mouse button is being let go of
@@ -196,9 +197,29 @@ class GattiBoard:
             # draw background
             screen.fill(bg_color)
 
+
+
+            # draw grid
+
+            start_col = self.cam_pos.x - (self.cam_pos.x % tp.GRID_SPACING)
+            start_row = self.cam_pos.y - (self.cam_pos.y % tp.GRID_SPACING)
+
+            n_col = int(tp.WIDTH / tp.GRID_SPACING / self.cam_scale)
+            n_row = int(tp.HEIGHT / tp.GRID_SPACING / self.cam_scale)
+
+            for i in range(n_col + 2):
+                col = gm.relto(gm.Vec2(start_col + i * tp.GRID_SPACING, 0), self.cam_pos, self.cam_scale)
+                pg.draw.line(screen, gc.GRID_COLOR, (col.x, 0), (col.x, tp.HEIGHT))
+
+            for j in range(n_row + 2):
+                row = gm.relto(gm.Vec2(0,start_row + j * tp.GRID_SPACING), self.cam_pos, self.cam_scale)
+                pg.draw.line(screen, gc.GRID_COLOR, (0, row.y), (tp.WIDTH, row.y))
+
+
+
             # draw images
             for i in range(0, self.img_count):
                 pos_screen = gm.relto(self.img_pos[i] + self.img_crop_pos[i], self.cam_pos, self.cam_scale)
                 screen.blit(self.img_srf_on[i], astuple(pos_screen))
-        
+
             pg.display.update()

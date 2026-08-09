@@ -11,3 +11,4 @@ with open(path, "r") as file:
     WIDTH = settings["width"]
     HEIGHT = settings["height"]
     THEME = settings["theme"]
+    GRID_SPACING = settings["grid_spacing"]

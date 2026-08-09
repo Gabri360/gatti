@@ -9,3 +9,4 @@ with open(gp.THEME, "r") as file:
     BG_SEARCH = palette["background-search"]
     BG_SPLASH = palette["background-splash"]
     TEXT = palette["text"]
+    GRID_COLOR = palette["grid"]
