@@ -1,5 +1,6 @@
 {
     "width": 1280,
     "height": 720,
-    "theme": "themes/default.json"
+    "theme": "themes/light.json",
+    "grid_spacing": 50
 }

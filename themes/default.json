@@ -3,5 +3,6 @@
     "background-move": "#222722",
     "background-search": "#000000",
     "background-splash": "#000000",
-    "text": "#ffffff"
+    "text": "#ffffff",
+    "grid": "#404040"
 }
