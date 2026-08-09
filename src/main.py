@@ -20,7 +20,7 @@ if __name__ != "__main__":
 # initialize graphics library and windowing
 pg.init()
 pg.display.set_caption("gatti")
-screen = pg.display.set_mode((gp.WIDTH, gp.HEIGHT), pg.RESIZABLE)
+screen = pg.display.set_mode((gp.WIDTH, gp.HEIGHT))
 
 # initialize blank program
 prog = GattiProgram.empty()
