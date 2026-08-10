@@ -1,4 +1,6 @@
 import pygame as pg
+from time import perf_counter
+import sys
 from dataclasses import dataclass, astuple
 
 import gatti_params as gp
@@ -75,12 +77,17 @@ class GattiBoard:
         # image portion that is out-of-scope is cropped away then the remaining is scaled
         self.img_srf_on[iimg] = pg.transform.smoothscale_by(self.img_srf_off[iimg].subsurface(rect), scale_total)
 
-    def run(self, screen):
+    def run(self, screen, font_hud):
 
         running = True
         bg_color = gc.BG_MOVE
 
+        win = 32
+        samples = [0] * win
         while running:
+
+            spf = perf_counter()
+
             for event in pg.event.get():
 
                 # globally pan the environment if no image is left clicked or by arbitrary right click
@@ -197,29 +204,43 @@ class GattiBoard:
             # draw background
             screen.fill(bg_color)
 
-
-
             # draw grid
-
             start_col = self.cam_pos.x - (self.cam_pos.x % gp.GRID_SPACING)
             start_row = self.cam_pos.y - (self.cam_pos.y % gp.GRID_SPACING)
-
+            
             n_col = int(gp.WIDTH / gp.GRID_SPACING / self.cam_scale)
             n_row = int(gp.HEIGHT / gp.GRID_SPACING / self.cam_scale)
-
-            for i in range(n_col + 2):
-                col = gm.relto(gm.Vec2(start_col + i * gp.GRID_SPACING, 0), self.cam_pos, self.cam_scale)
-                pg.draw.line(screen, gc.GRID_COLOR, (col.x, 0), (col.x, gp.HEIGHT))
-
-            for j in range(n_row + 2):
-                row = gm.relto(gm.Vec2(0,start_row + j * gp.GRID_SPACING), self.cam_pos, self.cam_scale)
-                pg.draw.line(screen, gc.GRID_COLOR, (0, row.y), (gp.WIDTH, row.y))
-
-
-
+            
+            # TODO: too many draw calls being made (~200ms)
+            #for i in range(n_col + 2):
+            #    col = gm.relto(gm.Vec2(start_col + i * gp.GRID_SPACING, 0), self.cam_pos, self.cam_scale)
+            #    pg.draw.line(screen, gc.GRID_COLOR, (col.x, 0), (col.x, gp.HEIGHT))
+            #
+            #for j in range(n_row + 2):
+            #    row = gm.relto(gm.Vec2(0,start_row + j * gp.GRID_SPACING), self.cam_pos, self.cam_scale)
+            #    pg.draw.line(screen, gc.GRID_COLOR, (0, row.y), (gp.WIDTH, row.y))
+            
             # draw images
             for i in range(0, self.img_count):
                 pos_screen = gm.relto(self.img_pos[i] + self.img_crop_pos[i], self.cam_pos, self.cam_scale)
                 screen.blit(self.img_srf_on[i], astuple(pos_screen))
+
+            # draw milliseconds per frame
+            samples.pop(0)
+            samples.append(perf_counter() - spf)
+            mspf_avg = str(gm.siground(100 * sum(samples) / win, 2)).ljust(5, '0')
+            msrf_spf = font_hud.render(f"mspf: {mspf_avg}", True, "#ffffff")
+            pos_hud = gm.Vec2(0, screen.get_height()) - gm.Vec2(0, 3 * font_hud.get_height())
+            screen.blit(msrf_spf, (pos_hud.x, pos_hud.y))
+
+            # loaded pixel count
+            srf_pixels = font_hud.render(f"pixels(loaded): {sum(srf.get_width() * srf.get_height() for srf in self.img_srf_off)}", True, "#ffffff")
+            pos_hud = gm.Vec2(0, screen.get_height()) - gm.Vec2(0, 2 * font_hud.get_height())
+            screen.blit(srf_pixels, (pos_hud.x, pos_hud.y))
+
+            # rendered pixel count
+            srf_pixels = font_hud.render(f"pixels(render): {sum(srf.get_width() * srf.get_height() for srf in self.img_srf_on)}", True, "#ffffff")
+            pos_hud = gm.Vec2(0, screen.get_height()) - gm.Vec2(0, font_hud.get_height())
+            screen.blit(srf_pixels, (pos_hud.x, pos_hud.y))
 
             pg.display.update()

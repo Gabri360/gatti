@@ -32,7 +32,8 @@ elif os.name == "nt":
             json.dump({
                 "width": 1280,
                 "height": 720,
-                "theme": os.path.join(common, "themes", "default.json")
+                "theme": os.path.join(common, "themes", "default.json"),
+                "grid_spacing": 50
             }, file, indent=4)
         
         # Install 'executable'
@@ -68,7 +69,8 @@ elif os.name == "posix":
             json.dump({
                 "width": 1280,
                 "height": 720,
-                "theme": os.path.join(common, "share", "gatti", "themes", "default.json")
+                "theme": os.path.join(common, "share", "gatti", "themes", "default.json"),
+                "grid_spacing": 50
             }, file, indent=4)
     
         # Install 'executable'

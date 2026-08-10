@@ -1,5 +1,9 @@
 from dataclasses import dataclass
+from math import log10, floor
 
+
+def siground(x, dc):
+    return round(x, -int(floor(log10(abs(x)))) + dc)
 
 @dataclass(slots=True, order=True)
 class Vec2:
@@ -33,3 +37,4 @@ def minmax(l: Vec2, m: Vec2, u: Vec2):
 
 def in_box(nw: Vec2, p: Vec2, se: Vec2):
     return nw.x < p.x < se.x and nw.y < p.y < se.y
+
