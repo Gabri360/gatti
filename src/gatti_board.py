@@ -82,7 +82,7 @@ class GattiBoard:
 
     def run(self, screen, font_hud):
 
-        self.grid = pg.Surface((gp.WIDTH + gp.GRID_SPACING, gp.HEIGHT + gp.GRID_SPACING), pg.SRCALPHA)
+        self.grid = pg.Surface((gp.WIDTH + gp.GRID_SPACING, gp.HEIGHT + gp.GRID_SPACING))
         running = True
         bg_color = gc.BG_MOVE
 
@@ -205,16 +205,14 @@ class GattiBoard:
                     if event.key == pg.K_ESCAPE:
                         return gs.GattiState.EXIT
 
-            # draw background
-            screen.fill(bg_color)
-
-            # draw grid
+            # update grid
             if (self.old_scale != self.cam_scale):
             
                 n_col = int(gp.WIDTH / gp.GRID_SPACING / self.cam_scale)
                 n_row = int(gp.HEIGHT / gp.GRID_SPACING / self.cam_scale)
-            
-                self.grid.fill((0, 0, 0, 0))
+
+                # fill background color
+                self.grid.fill(bg_color)
             
                 for i in range(n_col + 2):
                     col = i * gp.GRID_SPACING * self.cam_scale
@@ -224,7 +222,8 @@ class GattiBoard:
                     row = j * gp.GRID_SPACING * self.cam_scale
                     pg.draw.line(self.grid, gc.GRID_COLOR, (0, row), (gp.WIDTH+gp.GRID_SPACING, row))
                 self.old_scale = self.cam_scale
-            
+
+            # draw background & grid
             start_col = self.cam_pos.x - (self.cam_pos.x % gp.GRID_SPACING)
             start_row = self.cam_pos.y - (self.cam_pos.y % gp.GRID_SPACING)
             start = gm.Vec2(start_col,start_row)
