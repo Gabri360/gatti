@@ -14,7 +14,7 @@ class GattiBoard:
     # Variables (camera)
     cam_pos: gm.Vec2
     cam_scale: float
-
+    old_scale: float
     # Variables (images)
     img_count: int
     img_path: list[str]
@@ -26,12 +26,14 @@ class GattiBoard:
     img_size_off: list[gm.Vec2]
     img_scale: list[float]
     ifoc: int
+    grid: pg.Surface
 
     @classmethod
     def empty(cls):
         return cls(
             cam_pos=gm.Vec2(0.0, 0.0),
             cam_scale=1.0,
+            old_scale=0.0,
             img_count=0,
             img_path=[],
             img_pos=[],
@@ -41,7 +43,8 @@ class GattiBoard:
             img_size_on=[],
             img_size_off=[],
             img_scale=[],
-            ifoc=0
+            ifoc=0,
+            grid=None
         )
 
     def add(self, path, srf, pos, scale):
@@ -205,21 +208,31 @@ class GattiBoard:
             screen.fill(bg_color)
 
             # draw grid
+            if (self.old_scale != self.cam_scale):
+
+                n_col = int(gp.WIDTH / gp.GRID_SPACING / self.cam_scale)
+                n_row = int(gp.HEIGHT / gp.GRID_SPACING / self.cam_scale)
+
+                self.grid = pg.Surface((gp.WIDTH + gp.GRID_SPACING,gp.HEIGHT + gp.GRID_SPACING), pg.SRCALPHA)
+
+                for i in range(n_col + 2):
+                    col = i * gp.GRID_SPACING * self.cam_scale
+                    pg.draw.line(self.grid, gc.GRID_COLOR, (col, 0), (col, gp.HEIGHT+gp.GRID_SPACING))
+
+                for j in range(n_row + 2):
+                    row = j * gp.GRID_SPACING * self.cam_scale
+                    pg.draw.line(self.grid, gc.GRID_COLOR, (0, row), (gp.WIDTH+gp.GRID_SPACING, row))
+                self.old_scale = self.cam_scale
+
             start_col = self.cam_pos.x - (self.cam_pos.x % gp.GRID_SPACING)
             start_row = self.cam_pos.y - (self.cam_pos.y % gp.GRID_SPACING)
-            
-            n_col = int(gp.WIDTH / gp.GRID_SPACING / self.cam_scale)
-            n_row = int(gp.HEIGHT / gp.GRID_SPACING / self.cam_scale)
-            
-            # TODO: too many draw calls being made (~200ms)
-            #for i in range(n_col + 2):
-            #    col = gm.relto(gm.Vec2(start_col + i * gp.GRID_SPACING, 0), self.cam_pos, self.cam_scale)
-            #    pg.draw.line(screen, gc.GRID_COLOR, (col.x, 0), (col.x, gp.HEIGHT))
-            #
-            #for j in range(n_row + 2):
-            #    row = gm.relto(gm.Vec2(0,start_row + j * gp.GRID_SPACING), self.cam_pos, self.cam_scale)
-            #    pg.draw.line(screen, gc.GRID_COLOR, (0, row.y), (gp.WIDTH, row.y))
-            
+            start = gm.Vec2(start_col,start_row)
+            pos_grid = gm.relto(start,self.cam_pos,self.cam_scale)
+            screen.blit(self.grid, astuple(pos_grid))
+
+
+
+
             # draw images
             for i in range(0, self.img_count):
                 pos_screen = gm.relto(self.img_pos[i] + self.img_crop_pos[i], self.cam_pos, self.cam_scale)
