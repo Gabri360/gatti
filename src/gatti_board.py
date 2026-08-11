@@ -82,6 +82,7 @@ class GattiBoard:
 
     def run(self, screen, font_hud):
 
+        self.grid = pg.Surface((gp.WIDTH + gp.GRID_SPACING, gp.HEIGHT + gp.GRID_SPACING), pg.SRCALPHA)
         running = True
         bg_color = gc.BG_MOVE
 
@@ -209,29 +210,26 @@ class GattiBoard:
 
             # draw grid
             if (self.old_scale != self.cam_scale):
-
+            
                 n_col = int(gp.WIDTH / gp.GRID_SPACING / self.cam_scale)
                 n_row = int(gp.HEIGHT / gp.GRID_SPACING / self.cam_scale)
-
-                self.grid = pg.Surface((gp.WIDTH + gp.GRID_SPACING,gp.HEIGHT + gp.GRID_SPACING), pg.SRCALPHA)
-
+            
+                self.grid.fill((0, 0, 0, 0))
+            
                 for i in range(n_col + 2):
                     col = i * gp.GRID_SPACING * self.cam_scale
                     pg.draw.line(self.grid, gc.GRID_COLOR, (col, 0), (col, gp.HEIGHT+gp.GRID_SPACING))
-
+            
                 for j in range(n_row + 2):
                     row = j * gp.GRID_SPACING * self.cam_scale
                     pg.draw.line(self.grid, gc.GRID_COLOR, (0, row), (gp.WIDTH+gp.GRID_SPACING, row))
                 self.old_scale = self.cam_scale
-
+            
             start_col = self.cam_pos.x - (self.cam_pos.x % gp.GRID_SPACING)
             start_row = self.cam_pos.y - (self.cam_pos.y % gp.GRID_SPACING)
             start = gm.Vec2(start_col,start_row)
             pos_grid = gm.relto(start,self.cam_pos,self.cam_scale)
             screen.blit(self.grid, astuple(pos_grid))
-
-
-
 
             # draw images
             for i in range(0, self.img_count):
