@@ -82,6 +82,8 @@ class GattiBoard:
 
     def run(self, screen, font_hud):
 
+
+        self.grid = pg.Surface((3 * gp.WIDTH, 3 * gp.HEIGHT))
         running = True
         bg_color = gc.BG_MOVE
 
@@ -208,7 +210,9 @@ class GattiBoard:
             if (self.old_scale != self.cam_scale):
 
                 GRID_SPACING_scale=gp.GRID_SPACING * self.cam_scale
-                self.grid = pg.Surface((gp.WIDTH + 2 * GRID_SPACING_scale, gp.HEIGHT + 2 * GRID_SPACING_scale))
+
+                if (self.grid.get_width() < gp.WIDTH + GRID_SPACING_scale or self.grid.get_height() < gp.HEIGHT + GRID_SPACING_scale):
+                    self.grid = pg.Surface((gp.WIDTH + GRID_SPACING_scale, gp.HEIGHT + GRID_SPACING_scale))
 
                 n_col = int(gp.WIDTH / gp.GRID_SPACING / self.cam_scale)
                 n_row = int(gp.HEIGHT / gp.GRID_SPACING / self.cam_scale)
