@@ -68,7 +68,7 @@ class GattiProgram:
 
             return id
 
-    def run(self, screen):
+    def run(self, screen, path, name):
         while True:
             match self.state:
 
@@ -113,10 +113,11 @@ class GattiProgram:
                     self.state = self.board.run(screen, self.px_data, self.px_assoc, self.px_shape)
 
                 case GattiState.CLIP:
-                    with open(f"tmp_{self.id_count}.png", "wb") as file:
+                    path_ss = os.path.abspath(os.path.join(path, f"{name}_ss{self.id_count}.png"))
+                    with open(path_ss, "wb") as file:
                         call(["xclip", "-selection", "clipboard", "-o"], stdout=file)
 
-                    id = self.add(os.path.abspath(f"tmp_{self.id_count}.png"))
+                    id = self.add(path_ss)
                     if id < self.id_count:
                         self.board.add(id, self.px_shape, screen)
                     else:

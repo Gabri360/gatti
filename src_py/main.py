@@ -1,3 +1,4 @@
+import os
 import json
 import tarfile
 import pygame as pg
@@ -46,7 +47,9 @@ except FileNotFoundError as e:
     print(f"Couldn't find {path_save}, creating a new instance")
 
 
-prog.run(screen)
+path, name_ext = os.path.split(path_save)
+name, *ext = name_ext.split('.')
+prog.run(screen, path, name)
 
 
 # saving the latest program state
