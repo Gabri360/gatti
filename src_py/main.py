@@ -48,7 +48,7 @@ except FileNotFoundError as e:
 
 path, name_ext = os.path.split(path_save)
 name, *ext = name_ext.split('.')
-screen = pg.display.set_mode((gp.WIDTH, gp.HEIGHT))
+screen = pg.display.set_mode((gp.WIDTH, gp.HEIGHT), pg.RESIZABLE)
 prog.run(screen, path, name)
 
 
