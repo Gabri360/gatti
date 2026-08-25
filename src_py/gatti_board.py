@@ -68,7 +68,7 @@ class GattiBoard:
         self.img_count += 1
 
     def run(self, screen: pg.Surface, px_data: np.array, px_assoc: np.array, px_shape: np.array):
-        bg_color = gc.BG_MOVE
+        bg_color = gc.BG_TRAVEL
 
         cur_pos = np.array(pg.mouse.get_pos(), np.float64)
         cur_dpos = np.zeros((2,), np.float64)
@@ -102,6 +102,11 @@ class GattiBoard:
 
                     elif event.button == 3:
                         target = self.img_count
+
+                    if target == self.img_count:
+                        bg_color = gc.BG_TRAVEL
+                    else:
+                        bg_color = gc.BG_MOVE
 
                 if event.type == pg.MOUSEBUTTONUP:
                     action = Action.FLOAT

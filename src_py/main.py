@@ -21,7 +21,6 @@ if __name__ != "__main__":
 # initialize graphics library and windowing
 pg.init()
 pg.display.set_caption("gatti")
-screen = pg.display.set_mode((gp.WIDTH, gp.HEIGHT))
 
 # initialize blank program
 prog = GattiProgram.empty()
@@ -49,6 +48,7 @@ except FileNotFoundError as e:
 
 path, name_ext = os.path.split(path_save)
 name, *ext = name_ext.split('.')
+screen = pg.display.set_mode((gp.WIDTH, gp.HEIGHT))
 prog.run(screen, path, name)
 
 
