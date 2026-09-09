@@ -160,8 +160,10 @@ def install_linux():
             "grid_spacing": 50
         }, file, indent=4)
 
+    with open(os.path.join(dir_config_linux, "recents.json"), "w") as file:
+        json.dump([], file, indent=4)
+
     call(["cp", "-r", "themes", dir_config_linux])
-    call(["touch", os.path.join(dir_config_linux, "recents.txt")])
     call(["cp", "about.json", dir_config_linux])
     print("Done!")
 
@@ -216,8 +218,10 @@ def install_devenv():
     with open(os.path.join(DIR_BUILD, "path"), "w") as file:
         file.write(os.path.join(DIR_BUILD, "config"))
 
+    with open(os.path.join(DIR_BUILD, "config", "recents.json"), "w") as file:
+        json.dump([], file, indent=4)
+
     call(["cp", "-r", "themes", DIR_BUILD])
-    call(["touch", os.path.join(DIR_BUILD, "recents.txt")])
     call(["cp", "about.json", os.path.join(DIR_BUILD, "config")])
     print("Done!")
 

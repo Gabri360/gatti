@@ -1,4 +1,6 @@
 import os
+import tarfile
+import json
 import numpy as np
 import pygame as pg
 from dataclasses import dataclass
@@ -10,6 +12,7 @@ from gatti_board import GattiBoard
 from gatti_search import GattiSearch
 from gatti_splash  import GattiSplash
 from gatti_state import GattiState
+from gatti_serialization import load_program
 
 
 @dataclass(slots=True)
@@ -62,7 +65,7 @@ class GattiProgram:
             new_px_shape = np.array(srf.get_size(), dtype=np.uint32)
             self.px_data = ga.np_array_concat(self.px_data, np.array(new_px_data, dtype=np.uint8))
             self.px_shape = ga.np_array_concat(self.px_shape, np.array([new_px_shape], dtype=np.uint32))
-            
+
             # associate path to id
             self.id_src[path] = id
 
@@ -83,6 +86,12 @@ class GattiProgram:
                     bg.fill(gc.BG_SPLASH)
 
                     self.state = self.splash.run(screen, pg.font.SysFont("Calibri", 44), pg.font.SysFont("Calibri", 24), pg.font.SysFont("Calibri", 16), bg, pos_splash, size_splash)
+
+                    if self.splash.index != len(self.splash.recents):
+                        with tarfile.open(self.splash.recents[self.splash.index], "r:gz") as tar:
+                            data = json.load(tar.extractfile("board.json"))
+                            load_program(self, data)
+
 
                 case GattiState.SEARCH:
                     # fast gaussian blur (3-pass) of the board
