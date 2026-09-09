@@ -1,0 +1,19 @@
+{
+    "version": "pre-release",
+    "credits": [
+        {
+            "name": "Alessandro Rayan Ahmed",
+            "role": "development",
+            "contacts": {
+                "email": "iamreallybadatphysics@gmail.com"
+            },
+            "comment": "Founder and lead developer of the project"
+        },
+        {
+            "name": "Gabriele Baldi",
+            "role": "development",
+            "contacts": {},
+            "comment": "Developed the project in its early stages. Is responsible for the implementation of the 'grid'"
+        }
+    ]
+}
