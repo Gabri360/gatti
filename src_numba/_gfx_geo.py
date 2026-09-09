@@ -43,5 +43,30 @@ def point_in_box(
         return img_count - m
 
 
+@cc.export("boxes_in_box", "u4(f8[:], f8[:], f8[:,:], u4, u4[:])")
+@nb.jit(nopython=True, parallel=True, fastmath=True)
+def boxes_in_box(
+        cur_x0y0: np.array,
+        cur_xy: np.array,
+        img_box_gl: np.array,
+        img_count: int,
+        matches: np.array
+):
+    X, Y, W, H = 0, 1, 2, 3
+
+    if img_count == 0:
+        return 0
+
+    j = 0
+    for i in nb.prange(img_count):
+        if (cur_x0y0[X] < img_box_gl[i][X] < cur_xy[X] and
+            cur_x0y0[Y] < img_box_gl[i][Y] < cur_xy[Y] and
+            cur_x0y0[X] < img_box_gl[i][X] + img_box_gl[i][W] < cur_xy[X] and
+            cur_x0y0[Y] < img_box_gl[i][Y] + img_box_gl[i][H] < cur_xy[Y]):
+            matches[j] = i
+
+    return j
+
+
 if __name__ == "__main__":
     cc.compile()
