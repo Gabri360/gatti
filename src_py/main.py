@@ -56,6 +56,10 @@ prog.run(screen, path, name)
 
 
 # saving the latest program state
+
+if prog.splash.use_recents:
+    path_save = prog.splash.recents[0]
+
 with tarfile.open(path_save, "w:gz") as tar:
 
     # dump program state

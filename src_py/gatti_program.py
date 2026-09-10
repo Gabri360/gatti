@@ -87,10 +87,15 @@ class GattiProgram:
 
                     self.state = self.splash.run(screen, pg.font.SysFont("Calibri", 44), pg.font.SysFont("Calibri", 24), pg.font.SysFont("Calibri", 16), bg, pos_splash, size_splash)
 
-                    if self.splash.index != len(self.splash.recents):
-                        with tarfile.open(self.splash.recents[self.splash.index], "r:gz") as tar:
+                    if self.splash.use_recents:
+                        open_path=self.splash.recents[self.splash.index]
+                        with tarfile.open(open_path, "r:gz") as tar:
                             data = json.load(tar.extractfile("board.json"))
                             load_program(self, data)
+                        self.splash.recents.remove(open_path)
+                        self.splash.recents.insert(0, open_path)
+                        with open("/home/gabri/.config/gatti/recents.json", "w") as f:
+                            json.dump(self.splash.recents, f, indent=4)
 
 
                 case GattiState.SEARCH:

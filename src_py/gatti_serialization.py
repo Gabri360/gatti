@@ -63,7 +63,7 @@ def recents_write(abspath_save):
             else:
                 recents.remove(abspath_save)
                 recents.insert(0, abspath_save)
-    except FileNotFoundError:
-        recents[0]=abspath_save
+    except (FileNotFoundError, json.JSONDecodeError):
+        recents.append(abspath_save)
     with open("/home/gabri/.config/gatti/recents.json", "w") as f:
         json.dump(recents, f, indent = 4)

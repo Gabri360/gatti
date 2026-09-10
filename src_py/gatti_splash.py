@@ -30,12 +30,14 @@ with open(path, "r") as file:
 class GattiSplash:
     recents: list[str]
     index: int
+    use_recents: bool
 
     @classmethod
     def empty(cls):
         return cls(
             recents = [],
-            index = 0
+            index = 0,
+            use_recents = False
         )
 
     def run(self, screen: pg.Surface, font_title: pg.font.Font, font_subtitle: pg.font.Font, font_credits: pg.font.Font, bg: pg.Surface, pos: np.array, size: np.array):
@@ -97,6 +99,7 @@ class GattiSplash:
                         return gs.GattiState.EXIT
                     elif (event.key in binding) and binding[event.key]<len(self.recents):
                         self.index = binding[event.key]
+                        self.use_recents = True
                         return gs.GattiState.BOARD
 
             pg.display.update()
